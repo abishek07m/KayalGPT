@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KayalGPT</title>
+    <!-- Reliable Marked.js CDN for formatting markdown & code blocks -->
+    <script src="https://unpkg.com/marked@12.0.0/lib/marked.umd.js"></script>
+    <style>
+        :root {
+            --bg-sidebar: #171717;
+            --bg-main: #212121;
+            --bg-input: #2f2f2f;
+            --text-main: #ececec;
+            --text-secondary: #b4b4b4;
+            --border-color: #2f2f2f;
+            --accent-color: #10a37f;
+            --accent-hover: #1a7f64;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { display: flex; height: 100vh; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; }
+        
+        /* Sidebar */
+        .sidebar { width: 260px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; padding: 10px; border-right: 1px solid var(--border-color); }
+        .new-chat-btn { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 10px 12px; border-radius: 8px; text-align: left; cursor: pointer; margin-bottom: 15px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .new-chat-btn:hover { background-color: var(--bg-input); }
+        .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+        .history-item { padding: 10px 12px; font-size: 14px; color: var(--text-secondary); border-radius: 6px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-item:hover { background-color: var(--bg-input); color: var(--text-main); }
+        .history-item.active { background-color: var(--bg-input); color: var(--text-main); }
+        
+        /* Main Chat Area */
+        .chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; position: relative; background-color: var(--bg-main); }
+        .chat-header { padding: 15px 20px; font-size: 16px; font-weight: 600; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); }
+        
+        /* Header Title with ChatGPT style Logo */
+        .header-title { display: flex; align-items: center; gap: 10px; }
+        .chatgpt-logo { width: 24px; height: 24px; background-color: #10a37f; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; }
+        
+        .model-name { color: var(--text-secondary); font-size: 13px; font-weight: 500; background: var(--bg-input); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-color); }
+        
+        .messages-container { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 24px; align-items: center; }
+        .message-wrapper { width: 100%; max-width: 768px; display: flex; gap: 16px; font-size: 15px; line-height: 1.6; }
+        .message-wrapper.user { justify-content: flex-end; }
+        .message { padding: 2px 0; max-width: 80%; word-break: break-word; }
+        .message-wrapper.user .message { background-color: var(--bg-input); padding: 10px 16px; border-radius: 18px; white-space: pre-wrap; }
+        
+        /* Code Block Styling */
+        .message pre { background-color: #faf5f5; color: #0e0e0e; padding: 12px; border-radius: 8px; margin-top: 8px; overflow-x: auto; border: 1px solid #333; }
+        .message code { font-family: 'Courier New', Courier, monospace; font-size: 14px; }
+        .message p { margin-bottom: 8px; }
+        .message p:last-child { margin-bottom: 0; }
+        
+        /* Input Box Area & Disclaimer */
+        .input-container { padding: 0 20px 20px 20px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(transparent, var(--bg-main) 50%); }
+        .input-box { width: 100%; max-width: 768px; background-color: var(--bg-input); border-radius: 16px; padding: 10px 16px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .input-box textarea { flex: 1; background: transparent; border: none; color: var(--text-main); font-size: 15px; resize: none; outline: none; max-height: 200px; }
+        
+        .send-btn { background-color: var(--accent-color); color: #ffffff; border: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+        .send-btn:hover { background-color: var(--accent-hover); }
+
+        /* Disclaimer text */
+        .disclaimer { font-size: 12px; color: var(--text-secondary); margin-top: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <button class="new-chat-btn" onclick="startNewChat()">+ New chat</button>
+        <div class="history-list" id="historyList"></div>
+    </div>
+
+    <div class="chat-area">
+        <div class="chat-header">
+            <div class="header-title">
+                <div class="chatgpt-logo">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 0 1 7.54 16.6l-2.54 2.54a10 10 0 1 1-10-10z"></path></svg>
+                </div>
+                <span>KayalGPT</span>
+            </div>
+            <div class="model-name">ABI-LITE</div>
+        </div>
+
+        <div class="messages-container" id="chatMessages">
+            <div class="message-wrapper">
+                <div class="message">Hi there! 👋 My name is KayalGPT. How can I assist you today?</div>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-box">
+                <textarea id="userInput" rows="1" placeholder="Message KayalGPT..."></textarea>
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
+                </button>
+            </div>
+            <div class="disclaimer">KayalGPT is AI and can make mistakes.</div>
+        </div>
+    </div>
+
+    <script>
+        const webhookUrl = 'https://somasri.app.n8n.cloud/webhook/63151488-03ad-4429-8a3a-dce3ab6c302c/chat';
+        let sessions = JSON.parse(localStorage.getItem('kayal_sessions')) || [];
+        let currentSessionId = null;
+
+        if (sessions.length > 0) {
+            switchSession(sessions[0].id);
+        } else {
+            startNewChat();
+        }
+
+        const textarea = document.getElementById('userInput');
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        textarea.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function startNewChat() {
+            currentSessionId = 'session_' + Math.random().toString(36).substring(7);
+            const newSession = { id: currentSessionId, title: 'New Chat', messages: [] };
+            sessions.unshift(newSession);
+            saveSessions();
+            renderHistory();
+            clearChatUI();
+        }
+
+        function clearChatUI() {
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="message-wrapper">
+                    <div class="message">Hi there! 👋 My name is KayalGPT. How can I assist you today?</div>
+                </div>`;
+        }
+
+        function renderMarkdown(text) {
+            if (typeof marked !== 'undefined') {
+                return marked.parse(text);
+            }
+            return escapeHtml(text).replace(/\n/g, '<br>');
+        }
+
+        function switchSession(id) {
+            currentSessionId = id;
+            const session = sessions.find(s => s.id === id);
+            if (!session) return;
+
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = `
+                <div class="message-wrapper">
+                    <div class="message">Hi there! 👋 My name is KayalGPT. How can I assist you today?</div>
+                </div>`;
+            
+            session.messages.forEach(msg => {
+                if (msg.sender === 'user') {
+                    container.innerHTML += `
+                        <div class="message-wrapper user">
+                            <div class="message">${escapeHtml(msg.text)}</div>
+                        </div>`;
+                } else {
+                    container.innerHTML += `
+                        <div class="message-wrapper">
+                            <div class="message">${renderMarkdown(msg.text)}</div>
+                        </div>`;
+                }
+            });
+            container.scrollTop = container.scrollHeight;
+            renderHistory();
+        }
+
+        async function sendMessage() {
+            const text = textarea.value.trim();
+            if (!text) return;
+
+            let session = sessions.find(s => s.id === currentSessionId);
+            if (!session) {
+                session = { id: currentSessionId, title: text, messages: [] };
+                sessions.unshift(session);
+            } else if (session.title === 'New Chat' || session.messages.length === 0) {
+                session.title = text;
+            }
+
+            session.messages.push({ sender: 'user', text: text });
+            saveSessions();
+            renderHistory();
+
+            const container = document.getElementById('chatMessages');
+            container.innerHTML += `
+                <div class="message-wrapper user">
+                    <div class="message">${escapeHtml(text)}</div>
+                </div>`;
+            
+            textarea.value = '';
+            textarea.style.height = 'auto';
+            container.scrollTop = container.scrollHeight;
+
+            const aiId = 'ai_' + Date.now();
+            container.innerHTML += `
+                <div class="message-wrapper" id="${aiId}">
+                    <div class="message" style="color: var(--text-secondary);">Thinking...</div>
+                </div>`;
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: "sendMessage", sessionId: currentSessionId, chatInput: text })
+                });
+                
+                const data = await response.json();
+                let aiResponse = "No response received.";
+                if (Array.isArray(data)) {
+                    aiResponse = data[0]?.output || data[0]?.text || data[0]?.message || JSON.stringify(data[0]);
+                } else if (typeof data === 'object') {
+                    aiResponse = data.output || data.text || data.message || data.response || JSON.stringify(data);
+                } else {
+                    aiResponse = data;
+                }
+                
+                session.messages.push({ sender: 'ai', text: aiResponse });
+                saveSessions();
+
+                const aiElement = document.getElementById(aiId);
+                if (aiElement) {
+                    const aiMessageDiv = aiElement.querySelector('.message');
+                    aiMessageDiv.style.color = 'var(--text-main)';
+                    aiMessageDiv.innerHTML = renderMarkdown(aiResponse);
+                }
+            } catch (err) {
+                const aiElement = document.getElementById(aiId);
+                if (aiElement) {
+                    aiElement.querySelector('.message').innerText = "Error connecting to server.";
+                }
+            }
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function saveSessions() {
+            localStorage.setItem('kayal_sessions', JSON.stringify(sessions));
+        }
+
+        function renderHistory() {
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = '';
+            if (sessions.length === 0) {
+                historyList.innerHTML = `<div class="history-item">No chats yet</div>`;
+                return;
+            }
+            sessions.forEach(session => {
+                const activeClass = session.id === currentSessionId ? 'active' : '';
+                historyList.innerHTML += `<div class="history-item ${activeClass}" onclick="switchSession('${session.id}')">${escapeHtml(session.title)}</div>`;
+            });
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>
