@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KayalGPT</title>
     <!-- Marked.js CDN -->
     <script src="https://unpkg.com/marked@12.0.0/lib/marked.umd.js"></script>
@@ -19,7 +19,18 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
-        html, body { height: 100%; width: 100%; margin: 0; padding: 0; background-color: var(--bg-main); color: var(--text-main); overflow: hidden; position: fixed; }
+        /* Pull-to-refresh prevent panrathuku overscroll-behavior and fixed body */
+        html, body { 
+            height: 100%; 
+            width: 100%; 
+            margin: 0; 
+            padding: 0; 
+            background-color: var(--bg-main); 
+            color: var(--text-main); 
+            overflow: hidden; 
+            position: fixed; 
+            overscroll-behavior-y: none;
+        }
         
         /* Sidebar styling */
         .sidebar { width: 260px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; padding: 10px; border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; height: 100%; z-index: 100; transition: transform 0.3s ease; }
@@ -64,8 +75,8 @@
         
         .model-name { color: var(--text-secondary); font-size: 13px; font-weight: 500; background: var(--bg-input); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-color); }
         
-        /* Messages container & scrolling */
-        .messages-container { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; display: flex; flex-direction: column; gap: 24px; align-items: center; width: 100%; }
+        /* Messages container & smooth mobile scrolling */
+        .messages-container { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; display: flex; flex-direction: column; gap: 24px; align-items: center; width: 100%; overscroll-behavior-y: none; }
         .message-wrapper { width: 100%; max-width: 768px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.6; flex-shrink: 0; position: relative; }
         .message-wrapper.user { align-items: flex-end; }
         .message-wrapper.ai { align-items: flex-start; }
@@ -564,7 +575,7 @@
             if (session.title === 'New Chat' && text) {
                 session.title = text.length > 25 ? text.substring(0, 25) + '...' : text;
             } else if (session.title === 'New Chat' && currentImgFile) {
-                session.title = 'Image Error Analysis';
+                session.title = 'Image Analysis';
             }
 
             session.messages.push({ sender: 'user', text: text, image: currentImgBase64 });
@@ -594,7 +605,7 @@
 
             try {
                 const formData = new FormData();
-                formData.append('chatInput', text || "Please analyze this error screenshot and provide a solution.");
+                formData.append('chatInput', text || "Please analyze this image.");
                 formData.append('sessionId', currentSessionId);
                 if (currentImgFile) {
                     formData.append('image', currentImgFile);
