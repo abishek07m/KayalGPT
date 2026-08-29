@@ -19,23 +19,14 @@
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
         
-        html {
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            position: fixed;
-        }
-
-        body { 
-            height: 100%; 
+        /* Mobile pull-to-refresh prevent panra antha strict hidden-ah remove panniyachu */
+        html, body { 
             width: 100%; 
+            min-height: 100%;
             margin: 0; 
             padding: 0; 
             background-color: var(--bg-main); 
             color: var(--text-main); 
-            overflow: hidden; 
-            position: fixed;
-            touch-action: none;
         }
         
         /* Sidebar styling */
@@ -67,8 +58,8 @@
         .history-dropdown button.delete-option { color: #ff6b6b; }
 
         /* Main Chat Area */
-        .chat-area { flex: 1; display: flex; flex-direction: column; height: 100%; position: absolute; left: 260px; right: 0; top: 0; bottom: 0; background-color: var(--bg-main); transition: left 0.3s ease; z-index: 1; }
-        .chat-area.expanded { left: 0; }
+        .chat-area { display: flex; flex-direction: column; width: 100%; height: 100vh; padding-left: 260px; background-color: var(--bg-main); transition: padding-left 0.3s ease; }
+        .chat-area.expanded { padding-left: 0; }
         
         .chat-header { padding: 15px 20px; font-size: 16px; font-weight: 600; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); flex-shrink: 0; }
         
@@ -81,19 +72,17 @@
         
         .model-name { color: var(--text-secondary); font-size: 13px; font-weight: 500; background: var(--bg-input); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-color); }
         
-        /* Messages container & touch scroll fix */
+        /* Messages container - natural mobile scroll */
         .messages-container { 
             flex: 1; 
-            overflow-y: auto !important; 
+            overflow-y: auto; 
             -webkit-overflow-scrolling: touch; 
-            touch-action: pan-y !important; 
             padding: 20px; 
             display: flex; 
             flex-direction: column; 
             gap: 24px; 
             align-items: center; 
             width: 100%; 
-            overscroll-behavior: contain; 
         }
         
         .message-wrapper { width: 100%; max-width: 768px; display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.6; flex-shrink: 0; position: relative; }
@@ -148,7 +137,7 @@
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); z-index: 101; }
             .sidebar.mobile-open { transform: translateX(0); }
-            .chat-area { left: 0; z-index: 1; }
+            .chat-area { padding-left: 0; }
             .edit-btn { right: calc(85% + 5px); }
         }
     </style>
