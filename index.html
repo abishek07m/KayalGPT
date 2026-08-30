@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KayalGPT</title>
+    <!-- Marked.js CDN -->
     <script src="https://unpkg.com/marked@12.0.0/lib/marked.umd.js"></script>
+    <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <style>
@@ -19,7 +21,6 @@
             --accent-hover: #1a7f64;
         }
         
-        /* ChatGPT Official Font Stack with High-End Anti-aliasing */
         * { 
             box-sizing: border-box; 
             margin: 0; 
@@ -37,7 +38,7 @@
             padding: 0; 
             background-color: var(--bg-main); 
             color: var(--text-main); 
-            overflow: hidden; /* Prevents global page shaking/jitter */
+            overflow: hidden; 
         }
         
         /* Sidebar styling */
@@ -47,7 +48,6 @@
         .sidebar-top-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 14px 2px; border-bottom: 1px solid var(--border-color); margin-bottom: 12px; }
         .sidebar-brand-group { display: flex; align-items: center; gap: 10px; }
         
-        /* Official Logo Container Style */
         .ai-logo-icon { width: 26px; height: 26px; background-color: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; overflow: hidden; }
         .ai-logo-icon svg { width: 18px; height: 18px; fill: currentColor; }
         
@@ -95,13 +95,11 @@
         .header-title { display: flex; align-items: center; gap: 10px; }
         
         .header-right-btns { display: flex; align-items: center; gap: 8px; }
-        .export-btn, .live-voice-btn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500; }
-        .export-btn:hover, .live-voice-btn:hover { background: #3f3f3f; }
-        .live-voice-btn.active { background: var(--accent-color); border-color: var(--accent-color); color: #fff; animation: pulse 1.5s infinite; }
+        .export-btn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 12px; padding: 5px 10px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-weight: 500; }
+        .export-btn:hover { background: #3f3f3f; }
 
         .model-name { color: var(--text-secondary); font-size: 12px; font-weight: 600; background: var(--bg-input); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--border-color); letter-spacing: 0.03em; }
         
-        /* Animated Thinking Indicator CSS with Official Logo */
         .finding-container { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text-secondary); }
         .rotating-logo { width: 22px; height: 22px; background-color: var(--accent-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; animation: spinGlow 1.5s linear infinite; flex-shrink: 0; overflow: hidden; }
         .rotating-logo svg { width: 15px; height: 15px; fill: currentColor; }
@@ -192,7 +190,6 @@
         .action-btn:hover { background: var(--bg-input); color: var(--text-main); }
         .action-btn.active { color: var(--accent-color); }
 
-        /* Butter-smooth Code Container with GPU acceleration & Anti-shake */
         .code-container { 
             position: relative; 
             margin-top: 12px; 
@@ -228,8 +225,16 @@
         .message ul, .message ol { padding-left: 20px; margin-bottom: 10px; }
         .message li { margin-bottom: 4px; }
         
-        /* Input container - Rock-solid anti-shake layout */
+        /* Input container */
         .input-container { padding: 0 16px 16px 16px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(transparent, var(--bg-main) 50%); flex-shrink: 0; width: 100%; }
+        
+        /* Toolbar bar directly above the send button area / input box */
+        .input-toolbar-row { width: 100%; max-width: 768px; display: flex; justify-content: space-between; align-items: center; margin: 0 auto 6px auto; padding: 0 4px; }
+        
+        .live-voice-btn-toolbar { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 12px; padding: 4px 10px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 500; transition: all 0.2s; }
+        .live-voice-btn-toolbar:hover { background: #3f3f3f; }
+        .live-voice-btn-toolbar.active { background: var(--accent-color); border-color: var(--accent-color); color: #fff; animation: pulse 1.5s infinite; }
+
         .input-box { width: 100%; max-width: 768px; background-color: var(--bg-input); border-radius: 16px; padding: 10px 16px; display: flex; align-items: flex-end; gap: 10px; border: 1px solid rgba(255,255,255,0.05); margin: 0 auto; box-shadow: 0 0 15px rgba(0,0,0,0.1); contain: layout; }
         .input-box textarea { flex: 1; background: transparent; border: none; color: var(--text-main); font-size: 15px; resize: none; outline: none; height: 24px; max-height: 150px; padding-bottom: 2px; font-weight: 400; line-height: 1.5; overflow-y: hidden; }
         
@@ -242,7 +247,7 @@
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
 
@@ -250,7 +255,7 @@
         .image-preview-container img { width: 50px; height: 50px; object-fit: cover; border-radius: 6px; }
         .remove-img-btn { background: #333; color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; font-size: 12px; }
 
-        .disclaimer { font-size: 11.5px; color: var(--text-secondary); margin-top: 10px; text-align: center; width: 100%; font-weight: 400; }
+        .disclaimer { font-size: 11.5px; color: var(--text-secondary); margin-top: 8px; text-align: center; width: 100%; font-weight: 400; }
 
         @media (max-width: 768px) {
             .sidebar { transform: translateX(-100%); z-index: 101; }
@@ -305,10 +310,6 @@
                 </div>
             </div>
             <div class="header-right-btns">
-                <button class="live-voice-btn" id="liveVoiceBtn" onclick="toggleLiveVoiceMode()" title="Toggle Live Voice Walkie-Talkie Mode">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path></svg>
-                    <span id="liveVoiceText">Live Voice: OFF</span>
-                </button>
                 <button class="export-btn" onclick="exportChatTXT()" title="Export Chat as TXT">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                     Export
@@ -333,6 +334,16 @@
                 <img id="imagePreview" src="" alt="preview">
                 <button class="remove-img-btn" onclick="removeImage()">×</button>
             </div>
+
+            <!-- Toolbar Row directly above the input box (Right side / Separate row) -->
+            <div class="input-toolbar-row">
+                <div></div> <!-- Left spacer -->
+                <button class="live-voice-btn-toolbar" id="liveVoiceBtn" onclick="toggleLiveVoiceMode()">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path></svg>
+                    <span id="liveVoiceText">Live Voice: OFF</span>
+                </button>
+            </div>
+
             <div class="input-box">
                 <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
                 <button class="icon-btn" onclick="document.getElementById('imageInput').click()" title="Upload Image">
@@ -383,7 +394,7 @@
                 const speechText = event.results[0][0].transcript;
                 const textareaEl = document.getElementById('userInput');
                 textareaEl.value = speechText;
-                textareaEl.style.height = 'auto';
+                textareaEl.style.height = '24px';
                 textareaEl.style.height = (textareaEl.scrollHeight) + 'px';
                 document.getElementById('micBtn').classList.remove('listening');
                 
@@ -942,12 +953,13 @@
                 const messageBox = document.getElementById(aiMessageId);
                 const actionsBox = document.getElementById(`actions_${aiMessageId}`);
                 
+                // Optimized smooth medium speed type-writer effect (renders 2 characters smoothly every 15ms)
                 function typeWriter() {
                     if (charIndex < aiReply.length) {
-                        messageBox.innerHTML = renderMarkdown(aiReply.substring(0, charIndex + 3));
-                        charIndex += 3;
+                        messageBox.innerHTML = renderMarkdown(aiReply.substring(0, charIndex + 2));
+                        charIndex += 2;
                         container.scrollTop = container.scrollHeight;
-                        setTimeout(typeWriter, 10);
+                        setTimeout(typeWriter, 15);
                     } else {
                         messageBox.innerHTML = renderMarkdown(aiReply);
                         actionsBox.style.display = 'flex';
