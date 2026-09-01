@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KayalFly</title>
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
     <!-- Marked.js CDN -->
     <script src="https://unpkg.com/marked@12.0.0/lib/marked.umd.js"></script>
     <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <link rel="icon" type="image/svg+xml" href="logo.svg">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <!-- Firebase App & Auth SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -60,7 +60,6 @@
         
         .auth-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #f8fafc, #f1f5f9, #e2e8f0); z-index: -1; overflow: hidden; }
         
-        /* Movie Floating Cinematic Particles */
         .auth-bg-particle { position: absolute; border-radius: 50%; background: rgba(0, 0, 0, 0.04); animation: cinematicFloat linear infinite; }
         .auth-bg-particle:nth-child(1) { width: 120px; height: 120px; top: 10%; left: 15%; animation-duration: 14s; }
         .auth-bg-particle:nth-child(2) { width: 180px; height: 180px; top: 70%; left: 75%; animation-duration: 18s; animation-delay: -3s; }
@@ -73,7 +72,6 @@
             100% { transform: translateY(0) translateX(0) scale(1) rotate(360deg); }
         }
 
-        /* Gemini-style Mouse Interactive Glow Aura */
         .gemini-cursor-glow {
             position: absolute;
             width: 400px;
@@ -226,7 +224,7 @@
         /* Input Bar */
         .input-container { padding: 0 16px 20px 16px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(transparent, var(--bg-main) 60%); flex-shrink: 0; width: 100%; }
         .input-toolbar-row { width: 100%; max-width: 768px; display: flex; justify-content: flex-end; align-items: center; margin: 0 auto 6px auto; padding: 0 6px; }
-        .live-voice-btn-toolbar { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 12.5px; padding: 5px 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+        .live-voice-btn-toolbar { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 12.5px; padding: 5px 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; width: auto; max-width: max-content; }
         .live-voice-btn-toolbar.active { background: var(--accent-color); color: var(--bg-main); }
 
         .input-box { width: 100%; max-width: 768px; background-color: var(--bg-input); border-radius: 28px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
@@ -384,7 +382,7 @@
         <div class="chat-area" id="chatArea">
             <div class="chat-header">
                 <div class="header-left">
-                    <button class="menu-toggle" onclick="toggleSidebar()">
+                    <button class="menu-toggle" id="menuToggleBtn" onclick="toggleSidebar(event)">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
                     </button>
                     <div class="header-title">
@@ -469,7 +467,6 @@
         let currentUserUid = null;
         let currentUserEmail = null;
 
-        // Gemini Mouse Glow Tracker
         function updateGeminiCursor(e) {
             const glow = document.getElementById('geminiGlow');
             if (glow) {
@@ -726,12 +723,27 @@
         textarea.addEventListener('input', function() { this.style.height = '24px'; this.style.height = (this.scrollHeight) + 'px'; });
         textarea.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(isLiveVoiceMode); } });
 
-        function toggleSidebar() {
+        function toggleSidebar(event) {
+            if (event) event.stopPropagation();
             const sidebar = document.getElementById('sidebar');
             const chatArea = document.getElementById('chatArea');
-            if (window.innerWidth <= 768) sidebar.classList.toggle('mobile-open');
-            else { sidebar.classList.toggle('hidden'); chatArea.classList.toggle('expanded'); }
+            if (window.innerWidth <= 768) {
+                sidebar.classList.toggle('mobile-open');
+            } else {
+                sidebar.classList.toggle('hidden');
+                chatArea.classList.toggle('expanded');
+            }
         }
+
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('sidebar');
+            const menuToggleBtn = document.getElementById('menuToggleBtn');
+            if (window.innerWidth <= 768) {
+                if (sidebar.classList.contains('mobile-open') && !sidebar.contains(event.target) && !menuToggleBtn.contains(event.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
 
         function handleImageSelect(event) {
             const file = event.target.files[0];
