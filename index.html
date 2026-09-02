@@ -679,12 +679,11 @@
 
         async function handleGoogleLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
+            provider.setCustomParameters({
+                prompt: 'select_account'
+            });
             try { 
-                if (window.innerWidth <= 768) {
-                    await auth.signInWithRedirect(provider);
-                } else {
-                    await auth.signInWithPopup(provider);
-                }
+                await auth.signInWithPopup(provider);
             } catch (error) {
                 const successDiv = document.getElementById('emailSuccess');
                 if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
