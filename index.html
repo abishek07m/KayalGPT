@@ -679,20 +679,21 @@
 
         async function handleGoogleLogin() {
             const provider = new firebase.auth.GoogleAuthProvider();
-            provider.setCustomParameters({
-                prompt: 'select_account'
-            });
+            provider.setCustomParameters({ prompt: 'select_account' });
             try { 
-                await auth.signInWithPopup(provider);
+                await auth.signInWithRedirect(provider);
             } catch (error) {
                 const successDiv = document.getElementById('emailSuccess');
-                if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
-                    return;
-                }
                 successDiv.innerText = "Google Sign-In Error: " + error.message;
                 successDiv.style.display = "block";
             }
         }
+
+        auth.getRedirectResult().catch((error) => {
+            const successDiv = document.getElementById('emailSuccess');
+            successDiv.innerText = "Google Redirect Error: " + error.message;
+            successDiv.style.display = "block";
+        });
 
         async function logoutUser() { 
             closeSettingsModal(); 
