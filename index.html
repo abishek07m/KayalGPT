@@ -5,12 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>KayalFly</title>
     <link rel="icon" type="image/svg+xml" href="logo.svg">
-    <!-- Marked.js CDN -->
     <script src="https://unpkg.com/marked@12.0.0/lib/marked.umd.js"></script>
-    <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Firebase App & Auth SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
@@ -54,37 +51,55 @@
             overflow: hidden; 
         }
 
-        /* --- White Theme Login/Signup Page with Movie Animations & Gemini Mouse Aura --- */
+        /* --- Login Screen with Lots of Real Flying Butterflies --- */
         .auth-screen { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; justify-content: center; align-items: center; overflow: hidden; cursor: default; }
         .auth-screen.hidden { display: none; }
         
-        .auth-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #f8fafc, #f1f5f9, #e2e8f0); z-index: -1; overflow: hidden; }
+        .auth-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 40%, #ffffff 0%, #f1f5f9 70%, #e2e8f0 100%); z-index: -1; overflow: hidden; }
         
-        .auth-bg-particle { position: absolute; border-radius: 50%; background: rgba(0, 0, 0, 0.04); animation: cinematicFloat linear infinite; }
-        .auth-bg-particle:nth-child(1) { width: 120px; height: 120px; top: 10%; left: 15%; animation-duration: 14s; }
-        .auth-bg-particle:nth-child(2) { width: 180px; height: 180px; top: 70%; left: 75%; animation-duration: 18s; animation-delay: -3s; }
-        .auth-bg-particle:nth-child(3) { width: 90px; height: 90px; top: 40%; left: 85%; animation-duration: 12s; animation-delay: -1s; }
-        .auth-bg-particle:nth-child(4) { width: 150px; height: 150px; top: 30%; left: 25%; animation-duration: 16s; animation-delay: -5s; }
+        /* Realistic Animated SVG Butterflies with Wing Flapping */
+        .real-butterfly {
+            position: absolute;
+            width: 36px;
+            height: 36px;
+            pointer-events: none;
+            animation: butterflyDrift linear infinite;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+        }
 
-        @keyframes cinematicFloat {
-            0% { transform: translateY(0) translateX(0) scale(1) rotate(0deg); }
-            50% { transform: translateY(-40px) translateX(30px) scale(1.1) rotate(180deg); }
-            100% { transform: translateY(0) translateX(0) scale(1) rotate(360deg); }
+        .real-butterfly svg {
+            width: 100%;
+            height: 100%;
+            animation: wingFlap 0.3s ease-in-out infinite alternate;
+            transform-origin: center;
+        }
+
+        @keyframes wingFlap {
+            0% { transform: scaleX(0.3) rotate(-5deg); }
+            100% { transform: scaleX(1.1) rotate(5deg); }
+        }
+
+        @keyframes butterflyDrift {
+            0% { transform: translate(0px, 0px) rotate(0deg); }
+            25% { transform: translate(150px, -100px) rotate(20deg); }
+            50% { transform: translate(300px, -30px) rotate(-15deg); }
+            75% { transform: translate(120px, 110px) rotate(25deg); }
+            100% { transform: translate(0px, 0px) rotate(0deg); }
         }
 
         .gemini-cursor-glow {
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(147, 51, 234, 0.08) 40%, rgba(255, 255, 255, 0) 70%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.04) 50%, rgba(255, 255, 255, 0) 70%);
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            transition: width 0.3s, height 0.3s;
+            transition: width 0.15s, height 0.15s;
             z-index: 1;
         }
 
-        .auth-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); width: 90%; max-width: 420px; border-radius: 24px; padding: 36px; box-shadow: 0 20px 40px rgba(0,0,0,0.06); text-align: center; border: 1px solid rgba(226, 232, 240, 0.8); z-index: 2; position: relative; }
+        .auth-card { background: rgba(255, 255, 255, 0.88); backdrop-filter: blur(30px); width: 90%; max-width: 420px; border-radius: 24px; padding: 36px; box-shadow: 0 25px 60px rgba(0,0,0,0.07); text-align: center; border: 1px solid rgba(255, 255, 255, 1); z-index: 2; position: relative; }
         .auth-logo { width: 52px; height: 52px; margin: 0 auto 16px auto; }
         .auth-logo img { width: 100%; height: 100%; object-fit: contain; }
         .auth-title { font-size: 26px; font-weight: 700; margin-bottom: 6px; color: #0f172a; }
@@ -97,8 +112,14 @@
         .auth-btn:hover { background-color: #1e293b; }
         .auth-btn-google { background-color: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .auth-btn-google:hover { background-color: #f8fafc; }
+        
+        /* Small Text Link for Guest Option (No Box Style) */
+        .auth-guest-link-container { margin-top: 16px; }
+        .auth-guest-link { background: none; border: none; color: #64748b; font-size: 13px; font-weight: 500; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
+        .auth-guest-link:hover { color: #0f172a; }
+
         .auth-success-msg { color: #16a34a; font-size: 13px; font-weight: 600; margin-top: 10px; background: rgba(22, 163, 74, 0.1); padding: 10px; border-radius: 8px; display: none; line-height: 1.4; }
-        .auth-switch-text { font-size: 13px; color: #64748b; margin-top: 20px; }
+        .auth-switch-text { font-size: 13px; color: #64748b; margin-top: 16px; }
         .auth-switch-btn { color: #0f172a; background: none; border: none; cursor: pointer; font-weight: 600; text-decoration: underline; margin-left: 4px; }
 
         /* Modal Overlays */
@@ -152,8 +173,13 @@
         .sidebar-user-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; }
         .sidebar-user-info { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; color: var(--text-main); overflow: hidden; }
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background-color: var(--accent-color); color: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
-        .user-email-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
+        .user-email-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
         .settings-icon-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 6px; }
+        
+        /* Guest Sidebar Action Buttons Container (Login & Register) */
+        .guest-sidebar-btns { display: flex; gap: 5px; align-items: center; }
+        .guest-auth-action-btn { background: var(--accent-color); color: var(--bg-main); border: none; font-size: 11px; font-weight: 600; padding: 5px 8px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
+        .guest-reg-action-btn { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); font-size: 11px; font-weight: 600; padding: 5px 8px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
 
         /* Main Chat Area */
         .chat-area { display: flex; flex-direction: column; width: 100%; height: 100vh; padding-left: 260px; background-color: var(--bg-main); transition: padding-left 0.3s ease; }
@@ -195,18 +221,13 @@
         .edit-btn { position: absolute; right: calc(85% + 15px); top: 5px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: none; font-size: 12.5px; }
         .message-wrapper.user:hover .edit-btn { display: block; }
 
-        /* AI Message Actions Bar (Like, Dislike, Copy, Share) */
+        /* AI Message Actions Bar */
         .ai-message-actions { display: flex; gap: 6px; align-items: center; margin-top: 8px; color: var(--text-secondary); }
         .ai-action-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; transition: background 0.2s, color 0.2s; }
         .ai-action-btn:hover { background: var(--bg-input); color: var(--text-main); }
         .ai-action-btn.active { color: var(--accent-color); }
 
-        /* Standard Text Link Styling for Maps */
-        .message a {
-            color: #1a73e8;
-            text-decoration: underline;
-            font-weight: 500;
-        }
+        .message a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
 
         /* Movie Song Player Box */
         .song-player-box { margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); max-width: 360px; background: #000; }
@@ -250,15 +271,29 @@
 </head>
 <body>
 
-    <!-- 1. Separate Login / Signup Page with White Cinematic Movie Animations & Gemini Mouse Aura -->
     <div class="auth-screen" id="authScreen" onmousemove="updateGeminiCursor(event)">
         <div class="gemini-cursor-glow" id="geminiGlow"></div>
         <div class="auth-bg-container">
-            <div class="auth-bg-particle"></div>
-            <div class="auth-bg-particle"></div>
-            <div class="auth-bg-particle"></div>
-            <div class="auth-bg-particle"></div>
+            <div class="real-butterfly" style="top: 10%; left: 8%; animation-duration: 16s; transform: scale(0.7);">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b1)" opacity="0.8"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b1)" opacity="0.8"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#9333ea"/></linearGradient></defs></svg>
+            </div>
+            <div class="real-butterfly" style="top: 75%; left: 75%; animation-duration: 20s; animation-delay: -4s; transform: scale(1.1);">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b2)" opacity="0.85"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b2)" opacity="0.85"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs></svg>
+            </div>
+            <div class="real-butterfly" style="top: 25%; left: 88%; animation-duration: 14s; animation-delay: -2s; transform: scale(0.6);">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b3)" opacity="0.75"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b3)" opacity="0.75"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs></svg>
+            </div>
+            <div class="real-butterfly" style="top: 82%; left: 15%; animation-duration: 18s; animation-delay: -7s; transform: scale(0.9);">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b4)" opacity="0.85"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b4)" opacity="0.85"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs></svg>
+            </div>
+            <div class="real-butterfly" style="top: 45%; left: 5%; animation-duration: 22s; animation-delay: -10s; transform: scale(0.85);">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b5)" opacity="0.8"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b5)" opacity="0.8"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b5" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ef4444"/></linearGradient></defs></svg>
+            </div>
+            <div class="real-butterfly" style="top: 15%; left: 70%; animation-duration: 15s; animation-delay: -5s; transform: scale(0.75);">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b6)" opacity="0.8"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b6)" opacity="0.8"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b6" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a855f7"/></linearGradient></defs></svg>
+            </div>
         </div>
+        
         <div class="auth-card">
             <div class="auth-logo">
                 <img src="logo.svg" alt="Logo" />
@@ -284,6 +319,10 @@
                 Continue with Google
             </button>
 
+            <div class="auth-guest-link-container">
+                <button class="auth-guest-link" onclick="continueAsGuest()">Continue as Guest</button>
+            </div>
+
             <div class="auth-switch-text">
                 <span id="authSwitchPrompt">Need an account?</span> 
                 <button class="auth-switch-btn" onclick="toggleAuthMode()" id="authSwitchLink">Sign up</button>
@@ -291,7 +330,6 @@
         </div>
     </div>
 
-    <!-- 2. One-Time Onboarding Modal -->
     <div class="modal-overlay" id="onboardingModal">
         <div class="modal-content">
             <div class="modal-title">Tell us about yourself</div>
@@ -313,7 +351,6 @@
         </div>
     </div>
 
-    <!-- 3. Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <div class="modal-title">Settings</div>
@@ -338,7 +375,6 @@
         </div>
     </div>
 
-    <!-- 4. Main App Dashboard -->
     <div class="app-dashboard" id="appDashboard">
         <div class="sidebar" id="sidebar">
             <div class="sidebar-top-row">
@@ -367,15 +403,7 @@
             <div class="history-list" id="historyList"></div>
 
             <div class="sidebar-footer">
-                <div class="sidebar-user-row">
-                    <div class="sidebar-user-info">
-                        <div class="user-avatar" id="userAvatarText">U</div>
-                        <span class="user-email-text" id="userEmailText">user@email.com</span>
-                    </div>
-                    <button class="settings-icon-btn" onclick="openSettingsModal()" title="Settings">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                    </button>
-                </div>
+                <div class="sidebar-user-row" id="sidebarUserRowContainer"></div>
             </div>
         </div>
 
@@ -402,7 +430,7 @@
             <div class="messages-container-wrapper">
                 <div class="messages-container" id="chatMessages" onscroll="checkScrollPosition()">
                     <div class="message-wrapper ai">
-                        <div class="message" id="welcomeMsg">Hello, I am Kayal, how can I help you today?</div>
+                        <div class="message" id="welcomeMsg">Hello, how can I help you today?</div>
                     </div>
                 </div>
                 <button class="scroll-bottom-btn" id="scrollBottomBtn" onclick="scrollToBottom()">
@@ -443,8 +471,16 @@
                         </button>
                     </div>
                 </div>
-                <div class="disclaimer">KayalFly can make mistakes.</div>
+                <div class="disclaimer">KayalFly is AI and can make mistakes.</div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="guestLimitModal">
+        <div class="modal-content">
+            <div class="modal-title">Limit Reached</div>
+            <div class="modal-subtitle">Please log in or sign up to continue chatting.</div>
+            <button class="modal-btn" onclick="triggerLoginFromModal()">Log in / Sign up</button>
         </div>
     </div>
 
@@ -466,6 +502,8 @@
         let activeTypewriterTimeout = null;
         let currentUserUid = null;
         let currentUserEmail = null;
+        let isGuestMode = false;
+        let guestChatCount = 0;
 
         function updateGeminiCursor(e) {
             const glow = document.getElementById('geminiGlow');
@@ -475,7 +513,61 @@
             }
         }
 
+        function continueAsGuest() {
+            isGuestMode = true;
+            guestChatCount = 0;
+            currentUserUid = 'guest_user';
+            currentUserEmail = 'guest@kayalfly.com';
+            
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('appDashboard').classList.add('active');
+            
+            document.getElementById('sidebarUserRowContainer').innerHTML = `
+                <div class="sidebar-user-info">
+                    <div class="user-avatar">G</div>
+                    <span class="user-email-text">Guest User</span>
+                </div>
+                <div class="guest-sidebar-btns">
+                    <button class="guest-auth-action-btn" onclick="triggerLoginFromModal()">Login</button>
+                    <button class="guest-reg-action-btn" onclick="triggerRegisterFromModal()">Register</button>
+                </div>
+            `;
+            
+            applyPersonalizedWelcome({ name: "Guest" });
+            loadUserSessions();
+        }
+
+        function triggerLoginFromModal() {
+            document.getElementById('guestLimitModal').classList.remove('active');
+            document.getElementById('appDashboard').classList.remove('active');
+            document.getElementById('authScreen').classList.remove('hidden');
+            isSignUpMode = false;
+            updateAuthScreenUI();
+            isGuestMode = false;
+            auth.signOut();
+        }
+
+        function triggerRegisterFromModal() {
+            document.getElementById('guestLimitModal').classList.remove('active');
+            document.getElementById('appDashboard').classList.remove('active');
+            document.getElementById('authScreen').classList.remove('hidden');
+            isSignUpMode = true;
+            updateAuthScreenUI();
+            isGuestMode = false;
+            auth.signOut();
+        }
+
+        function updateAuthScreenUI() {
+            document.getElementById('authTitle').innerText = isSignUpMode ? "Create Account" : "Welcome to KayalFly";
+            document.getElementById('authSubtitle').innerText = isSignUpMode ? "Sign up to receive email verification link" : "Log in to access your chat dashboard";
+            document.getElementById('emailSubmitBtn').innerText = isSignUpMode ? "Sign up" : "Log in";
+            document.getElementById('authSwitchPrompt').innerText = isSignUpMode ? "Already have an account?" : "Need an account?";
+            document.getElementById('authSwitchLink').innerText = isSignUpMode ? "Log in" : "Sign up";
+            document.getElementById('emailSuccess').style.display = "none";
+        }
+
         auth.onAuthStateChanged(async (user) => {
+            if (isGuestMode) return;
             const authScreen = document.getElementById('authScreen');
             const appDashboard = document.getElementById('appDashboard');
             const onboardingModal = document.getElementById('onboardingModal');
@@ -495,9 +587,16 @@
                 authScreen.classList.add('hidden');
                 appDashboard.classList.add('active');
                 
-                document.getElementById('userEmailText').innerText = currentUserEmail;
+                document.getElementById('sidebarUserRowContainer').innerHTML = `
+                    <div class="sidebar-user-info">
+                        <div class="user-avatar" id="userAvatarText">${currentUserEmail.charAt(0).toUpperCase()}</div>
+                        <span class="user-email-text" id="userEmailText">${currentUserEmail}</span>
+                    </div>
+                    <button class="settings-icon-btn" onclick="openSettingsModal()" title="Settings">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                    </button>
+                `;
                 document.getElementById('settingEmail').value = currentUserEmail;
-                document.getElementById('userAvatarText').innerText = currentUserEmail.charAt(0).toUpperCase();
 
                 const profileKey = `kayalfly_profile_${currentUserUid}`;
                 const savedProfile = localStorage.getItem(profileKey);
@@ -511,19 +610,21 @@
                     loadUserSessions();
                 }
             } else {
-                currentUserUid = null;
-                currentUserEmail = null;
-                authScreen.classList.remove('hidden');
-                appDashboard.classList.remove('active');
-                onboardingModal.classList.remove('active');
-                sessions = [];
-                renderHistory();
+                if (!isGuestMode) {
+                    currentUserUid = null;
+                    currentUserEmail = null;
+                    authScreen.classList.remove('hidden');
+                    appDashboard.classList.remove('active');
+                    onboardingModal.classList.remove('active');
+                    sessions = [];
+                    renderHistory();
+                }
             }
         });
 
         function applyPersonalizedWelcome(profile) {
             const welcomeEl = document.getElementById('welcomeMsg');
-            if (welcomeEl) welcomeEl.innerText = `Hello ${profile.name}, I am Kayal, how can I help you today?`;
+            if (welcomeEl) welcomeEl.innerText = `Hello ${profile.name}, how can I help you today?`;
         }
 
         function saveOnboardingData() {
@@ -552,12 +653,7 @@
 
         function toggleAuthMode() {
             isSignUpMode = !isSignUpMode;
-            document.getElementById('authTitle').innerText = isSignUpMode ? "Create Account" : "Welcome to KayalFly";
-            document.getElementById('authSubtitle').innerText = isSignUpMode ? "Sign up to receive email verification link" : "Log in to access your chat dashboard";
-            document.getElementById('emailSubmitBtn').innerText = isSignUpMode ? "Sign up" : "Log in";
-            document.getElementById('authSwitchPrompt').innerText = isSignUpMode ? "Already have an account?" : "Need an account?";
-            document.getElementById('authSwitchLink').innerText = isSignUpMode ? "Log in" : "Sign up";
-            document.getElementById('emailSuccess').style.display = "none";
+            updateAuthScreenUI();
         }
 
         async function handleEmailAuth() {
@@ -597,7 +693,11 @@
             }
         }
 
-        async function logoutUser() { closeSettingsModal(); await auth.signOut(); }
+        async function logoutUser() { 
+            closeSettingsModal(); 
+            isGuestMode = false;
+            await auth.signOut(); 
+        }
         function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
         function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
         
@@ -631,7 +731,7 @@
         }
 
         function saveSessions() {
-            if (!currentUserUid) return;
+            if (!currentUserUid || isGuestMode) return;
             localStorage.setItem(`kayalfly_sessions_${currentUserUid}`, JSON.stringify(sessions));
         }
 
@@ -770,12 +870,24 @@
             currentSessionId = 'session_' + Math.random().toString(36).substring(7);
             sessions.unshift({ id: currentSessionId, title: 'New Chat', messages: [], pinned: false });
             saveSessions(); renderHistory(); clearChatUI();
-            if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('mobile-open');
+            
+            textarea.value = '';
+            textarea.style.height = '24px';
+            removeImage();
+
+            const sidebar = document.getElementById('sidebar');
+            const chatArea = document.getElementById('chatArea');
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('mobile-open');
+            } else {
+                sidebar.classList.add('hidden');
+                chatArea.classList.add('expanded');
+            }
         }
 
         function clearChatUI() {
-            const profileData = JSON.parse(localStorage.getItem(`kayalfly_profile_${currentUserUid}`)) || { name: "User" };
-            document.getElementById('chatMessages').innerHTML = `<div class="message-wrapper ai"><div class="message">Hello ${profileData.name}, I am Kayal, how can I help you today?</div></div>`;
+            const profileData = isGuestMode ? { name: "Guest" } : (JSON.parse(localStorage.getItem(`kayalfly_profile_${currentUserUid}`)) || { name: "User" });
+            document.getElementById('chatMessages').innerHTML = `<div class="message-wrapper ai"><div class="message">Hello ${profileData.name}, how can I help you today?</div></div>`;
         }
 
         function switchTab(tab) {
@@ -936,8 +1048,8 @@
             const s = sessions.find(item => item.id === id);
             if (!s) return;
             const container = document.getElementById('chatMessages');
-            const profile = JSON.parse(localStorage.getItem(`kayalfly_profile_${currentUserUid}`)) || { name: "User" };
-            container.innerHTML = `<div class="message-wrapper ai"><div class="message">Hello ${profile.name}, I am Kayal, how can I help you today?</div></div>`;
+            const profile = isGuestMode ? { name: "Guest" } : (JSON.parse(localStorage.getItem(`kayalfly_profile_${currentUserUid}`)) || { name: "User" });
+            container.innerHTML = `<div class="message-wrapper ai"><div class="message">Hello ${profile.name}, how can I help you today?</div></div>`;
             s.messages.forEach((msg, idx) => {
                 if (msg.sender === 'user') {
                     let imgTag = msg.image ? `<img src="${msg.image}">` : '';
@@ -973,6 +1085,15 @@
 
         async function sendMessage(autoSpeak = false) {
             if (isGenerating) return;
+
+            if (isGuestMode) {
+                if (guestChatCount >= 5) {
+                    document.getElementById('guestLimitModal').classList.add('active');
+                    return;
+                }
+                guestChatCount++;
+            }
+
             const rawText = textarea.value.trim();
             const currentImgFile = selectedImageFile;
             const currentImgBase64 = selectedImageBase64;
@@ -984,7 +1105,7 @@
             if (session.title === 'New Chat' && rawText) session.title = rawText.length > 25 ? rawText.substring(0, 25) + '...' : rawText;
 
             const emailMatch = rawText.match(/^!sendto\s+([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\s+(.+)$/);
-            if (emailMatch && currentUserEmail) {
+            if (emailMatch && currentUserEmail && !isGuestMode) {
                 const toEmail = emailMatch[1];
                 const emailMessage = emailMatch[2];
                 session.messages.push({ sender: 'user', text: rawText });
@@ -1066,7 +1187,9 @@
                 const data = await response.json();
                 document.getElementById(loadingId)?.remove();
 
-                const aiReply = data.output || data.text || data.message || JSON.stringify(data);
+                let fullAiReply = data.output || data.text || data.message || JSON.stringify(data);
+                let aiReply = fullAiReply.trim();
+
                 session.messages.push({ sender: 'ai', text: aiReply });
                 saveSessions();
 
@@ -1081,10 +1204,10 @@
                 function typeWriter() {
                     if (!isGenerating) return;
                     if (charIdx < aiReply.length) {
-                        msgBox.innerHTML = renderMarkdown(aiReply.substring(0, charIdx + 2));
-                        charIdx += 2;
+                        msgBox.innerHTML = renderMarkdown(aiReply.substring(0, charIdx + 4));
+                        charIdx += 4;
                         container.scrollTop = container.scrollHeight;
-                        activeTypewriterTimeout = setTimeout(typeWriter, 15);
+                        activeTypewriterTimeout = setTimeout(typeWriter, 10);
                     } else {
                         msgBox.innerHTML = renderMarkdown(aiReply);
                         wrapperBox.insertAdjacentHTML('beforeend', createAiActions(aiReply));
