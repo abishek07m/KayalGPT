@@ -2,17 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
     <title>KayalFly</title>
     <link rel="icon" type="image/svg+xml" href="logo.svg">
-    <!-- Marked.js CDN -->
     <script src="https://unpkg.com/marked@12.0.0/lib/marked.umd.js"></script>
-    <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <!-- Firebase App & Auth SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-sidebar: #f9f9f9;
@@ -52,95 +48,201 @@
             background-color: var(--bg-main); 
             color: var(--text-main); 
             overflow: hidden; 
+            position: fixed;
+            touch-action: manipulation;
         }
 
-        /* --- Fully Responsive Login Screen for Mobile & Desktop --- */
-        .auth-screen { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; justify-content: center; align-items: center; overflow-y: auto; padding: 16px; cursor: default; }
+        .auth-screen { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; background-color: #ffffff; overflow: hidden; }
         .auth-screen.hidden { display: none; }
         
-        .auth-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 50% 40%, #ffffff 0%, #f1f5f9 70%, #e2e8f0 100%); z-index: -1; overflow: hidden; }
-        
-        /* Realistic Animated SVG Butterflies with Wing Flapping */
-        .real-butterfly {
-            position: absolute;
-            width: 32px;
-            height: 32px;
-            pointer-events: none;
-            animation: butterflyDrift linear infinite;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.06));
+        .auth-left-panel {
+            flex: 1.2;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            height: 100%;
         }
 
-        .real-butterfly svg {
+        .video-robot-container {
+            width: 160px;
+            height: 160px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 70%);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 36px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
+            transition: transform 0.08s ease-out;
+        }
+
+        .robot-face-box {
+            width: 86px;
+            height: 54px;
+            border: 2.5px solid #ffffff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 10px;
+            position: relative;
+            background: rgba(0, 0, 0, 0.4);
+            box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.2);
+        }
+
+        .robot-eye {
+            width: 12px;
+            height: 16px;
+            background: #ffffff;
+            border-radius: 3px;
+            position: relative;
+            box-shadow: 0 0 10px #ffffff;
+            transition: transform 0.04s ease-out;
+        }
+
+        .robot-glow-dot {
+            width: 70px;
+            height: 16px;
+            background: rgba(255, 255, 255, 0.35);
+            filter: blur(12px);
+            margin-top: 20px;
+            border-radius: 50%;
+        }
+
+        .auth-right-panel {
+            flex: 1;
+            background-color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+            height: 100%;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .auth-card { 
+            width: 100%; 
+            max-width: 360px; 
+            text-align: left; 
+            position: relative; 
+            margin: auto; 
+        }
+
+        .auth-logo-badge {
+            width: 44px;
+            height: 44px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .auth-logo-badge img {
             width: 100%;
             height: 100%;
-            animation: wingFlap 0.3s ease-in-out infinite alternate;
-            transform-origin: center;
+            object-fit: contain;
         }
 
-        @keyframes wingFlap {
-            0% { transform: scaleX(0.3) rotate(-5deg); }
-            100% { transform: scaleX(1.1) rotate(5deg); }
-        }
-
-        @keyframes butterflyDrift {
-            0% { transform: translate(0px, 0px) rotate(0deg); }
-            25% { transform: translate(120px, -80px) rotate(20deg); }
-            50% { transform: translate(240px, -20px) rotate(-15deg); }
-            75% { transform: translate(100px, 90px) rotate(25deg); }
-            100% { transform: translate(0px, 0px) rotate(0deg); }
-        }
-
-        .gemini-cursor-glow {
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, rgba(147, 51, 234, 0.04) 50%, rgba(255, 255, 255, 0) 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 1;
-        }
-
-        .auth-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(25px); width: 100%; max-width: 400px; border-radius: 20px; padding: 24px 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); text-align: center; border: 1px solid rgba(255, 255, 255, 1); z-index: 2; position: relative; margin: auto; max-height: 90vh; overflow-y: auto; }
-        .auth-logo { width: 44px; height: 44px; margin: 0 auto 12px auto; }
-        .auth-logo img { width: 100%; height: 100%; object-fit: contain; }
-        .auth-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; color: #0f172a; }
-        .auth-subtitle { font-size: 13px; color: #64748b; margin-bottom: 20px; }
-        .auth-input-group { text-align: left; margin-bottom: 12px; }
-        .auth-input-label { font-size: 11.5px; font-weight: 600; margin-bottom: 4px; display: block; color: #334155; }
-        .auth-input { width: 100%; padding: 11px 14px; border: 1px solid #cbd5e1; background: #ffffff; color: #0f172a; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
-        .auth-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
-        .auth-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer; margin-top: 8px; background-color: #0f172a; color: #ffffff; transition: background-color 0.2s; }
-        .auth-btn:hover { background-color: #1e293b; }
-        .auth-btn-google { background-color: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .auth-btn-google:hover { background-color: #f8fafc; }
+        .auth-title { font-size: 26px; font-weight: 700; margin-bottom: 4px; color: #000000; letter-spacing: -0.5px; }
+        .auth-subtitle { font-size: 13.5px; color: #666666; margin-bottom: 22px; }
         
-        .auth-guest-link-container { margin-top: 12px; }
-        .auth-guest-link { background: none; border: none; color: #64748b; font-size: 12.5px; font-weight: 500; cursor: pointer; text-decoration: underline; transition: color 0.2s; }
-        .auth-guest-link:hover { color: #0f172a; }
+        .auth-input-group { text-align: left; margin-bottom: 14px; }
+        .auth-input-label { font-size: 12.5px; font-weight: 600; margin-bottom: 5px; display: block; color: #111111; }
+        .auth-input { width: 100%; padding: 12px 14px; border: 1px solid #dcdcdc; background: #fafafa; color: #000000; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s; }
+        .auth-input:focus { border-color: #000000; background: #ffffff; }
 
-        .auth-success-msg { color: #16a34a; font-size: 12.5px; font-weight: 600; margin-top: 8px; background: rgba(22, 163, 74, 0.1); padding: 8px; border-radius: 6px; display: none; line-height: 1.4; }
-        .auth-switch-text { font-size: 12.5px; color: #64748b; margin-top: 14px; }
-        .auth-switch-btn { color: #0f172a; background: none; border: none; cursor: pointer; font-weight: 600; text-decoration: underline; margin-left: 4px; }
+        .auth-row-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            margin-bottom: 18px;
+            color: #444444;
+        }
+        
+        .auth-checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+        .auth-forgot-link { background: none; border: none; color: #444444; font-size: 13px; cursor: pointer; text-decoration: none; font-weight: 500; }
+        .auth-forgot-link:hover { text-decoration: underline; }
 
-        /* Modal Overlays */
+        .auth-btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer; background: #000000; color: #ffffff; transition: background 0.2s; }
+        .auth-btn:hover { background: #222222; }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 18px 0;
+            color: #888888;
+            font-size: 13px;
+        }
+        .auth-divider::before, .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .auth-divider::before { margin-right: .75em; }
+        .auth-divider::after { margin-left: .75em; }
+
+        .auth-social-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .auth-social-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #dcdcdc;
+            background: #ffffff;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #000000;
+            transition: background 0.2s;
+        }
+        .auth-social-btn:hover { background: #f5f5f5; }
+
+        .auth-success-msg { color: #16a34a; font-size: 13px; font-weight: 600; margin-top: 8px; background: #f0fdf4; padding: 8px; border-radius: 6px; display: none; }
+        
+        .auth-switch-text { font-size: 13.5px; color: #666666; text-align: center; margin-top: 6px; }
+        .auth-switch-btn { color: #000000; background: none; border: none; cursor: pointer; font-weight: 700; text-decoration: underline; margin-left: 4px; }
+
+        @media (max-width: 768px) {
+            .auth-screen { flex-direction: column; overflow-y: auto; position: absolute; }
+            .auth-left-panel { display: none !important; }
+            .auth-right-panel { width: 100%; height: 100%; padding: 24px 16px; justify-content: center; }
+            .auth-card { max-width: 100%; }
+        }
+
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; padding: 16px; }
         .modal-overlay.active { display: flex; }
-        .modal-content { background: var(--bg-main); width: 100%; max-width: 400px; border-radius: 18px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; border: 1px solid var(--border-color); }
-        .modal-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; color: var(--text-main); }
-        .modal-subtitle { font-size: 13.5px; color: var(--text-secondary); margin-bottom: 20px; }
-        .modal-input-group { text-align: left; margin-bottom: 14px; }
-        .modal-input-label { font-size: 11.5px; font-weight: 600; margin-bottom: 4px; display: block; color: var(--text-secondary); }
-        .modal-input, .modal-select { width: 100%; padding: 11px 14px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); border-radius: 10px; font-size: 14px; outline: none; }
-        .modal-btn { width: 100%; padding: 12px; border: none; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer; margin-top: 8px; background-color: var(--accent-color); color: var(--bg-main); }
+        .modal-content { background: var(--bg-main); width: 100%; max-width: 380px; border-radius: 18px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; border: 1px solid var(--border-color); }
+        .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; color: var(--text-main); }
+        .modal-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
+        .modal-input-group { text-align: left; margin-bottom: 12px; }
+        .modal-input-label { font-size: 11px; font-weight: 600; margin-bottom: 3px; display: block; color: var(--text-secondary); }
+        .modal-input, .modal-select { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); border-radius: 10px; font-size: 13.5px; outline: none; }
+        .modal-btn { width: 100%; padding: 11px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; background-color: var(--accent-color); color: var(--bg-main); }
         .modal-btn:hover { opacity: 0.9; }
-        .modal-logout-btn { background-color: #ef4444; color: #ffffff; margin-top: 14px; }
+        .modal-logout-btn { background-color: #ef4444; color: #ffffff; margin-top: 12px; }
+        .modal-btn-row { display: flex; gap: 8px; margin-top: 14px; }
+        .modal-btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); }
 
-        /* Main App Dashboard */
         .app-dashboard { display: none; width: 100%; height: 100vh; position: relative; }
         .app-dashboard.active { display: flex; }
 
-        /* Sidebar */
         .sidebar { width: 260px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; padding: 12px; border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; height: 100%; z-index: 100; transition: transform 0.3s ease; }
         .sidebar.hidden { transform: translateX(-100%); }
         .sidebar-top-row { display: flex; align-items: center; justify-content: space-between; padding: 4px; margin-bottom: 4px; }
@@ -181,7 +283,6 @@
         .guest-auth-action-btn { background: var(--accent-color); color: var(--bg-main); border: none; font-size: 11px; font-weight: 600; padding: 5px 8px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
         .guest-reg-action-btn { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); font-size: 11px; font-weight: 600; padding: 5px 8px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
 
-        /* Main Chat Area */
         .chat-area { display: flex; flex-direction: column; width: 100%; height: 100vh; padding-left: 260px; background-color: var(--bg-main); transition: padding-left 0.3s ease; }
         .chat-area.expanded { padding-left: 0; }
         .chat-header { padding: 16px 20px; font-size: 15.5px; font-weight: 600; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); flex-shrink: 0; }
@@ -194,17 +295,8 @@
         .model-name { color: var(--text-secondary); font-size: 12px; font-weight: 600; background: var(--bg-input); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border-color); flex-shrink: 0; }
 
         .finding-container { display: flex; align-items: center; gap: 12px; font-size: 15.5px; font-weight: 700; color: var(--text-main); }
-        .rotating-logo { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; animation: butterflyFlightPath 1.8s ease-in-out infinite; flex-shrink: 0; transform-origin: center; }
+        .rotating-logo { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .rotating-logo img { width: 100%; height: 100%; object-fit: contain; }
-        
-        @keyframes butterflyFlightPath {
-            0% { transform: translateY(0px) rotate(0deg) scale(1); }
-            20% { transform: translateY(-7px) rotate(-12deg) scale(1.15) skewX(-5deg); }
-            40% { transform: translateY(-2px) rotate(4deg) scale(0.95); }
-            60% { transform: translateY(-9px) rotate(12deg) scale(1.2) skewX(5deg); }
-            80% { transform: translateY(-3px) rotate(-4deg) scale(1.05); }
-            100% { transform: translateY(0px) rotate(0deg) scale(1); }
-        }
 
         .messages-container-wrapper { position: relative; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
         .messages-container { flex: 1; overflow-y: auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 28px; align-items: center; width: 100%; }
@@ -263,63 +355,104 @@
         }
     </style>
 </head>
-<body>
+<body onmousemove="trackCursorForRobot(event)">
 
-    <!-- 1. Login Screen with Lots of Real Flapping Butterflies -->
-    <div class="auth-screen" id="authScreen" onmousemove="updateGeminiCursor(event)">
-        <div class="gemini-cursor-glow" id="geminiGlow"></div>
-        <div class="auth-bg-container">
-            <div class="real-butterfly" style="top: 10%; left: 8%; animation-duration: 16s; transform: scale(0.7);">
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b1)" opacity="0.8"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b1)" opacity="0.8"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#9333ea"/></linearGradient></defs></svg>
-            </div>
-            <div class="real-butterfly" style="top: 75%; left: 75%; animation-duration: 20s; animation-delay: -4s; transform: scale(1.1);">
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b2)" opacity="0.85"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b2)" opacity="0.85"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#06b6d4"/></linearGradient></defs></svg>
-            </div>
-            <div class="real-butterfly" style="top: 25%; left: 88%; animation-duration: 14s; animation-delay: -2s; transform: scale(0.6);">
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b3)" opacity="0.75"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b3)" opacity="0.75"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ec4899"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs></svg>
-            </div>
-            <div class="real-butterfly" style="top: 82%; left: 15%; animation-duration: 18s; animation-delay: -7s; transform: scale(0.9);">
-                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M50 50C50 30 30 10 15 15C0 20 5 45 35 50C5 55 0 80 15 85C30 90 50 70 50 50Z" fill="url(#b4)" opacity="0.85"/><path d="M50 50C50 30 70 10 85 15C100 20 95 45 65 50C95 55 100 80 85 85C70 90 50 70 50 50Z" fill="url(#b4)" opacity="0.85"/><line x1="50" y1="20" x2="50" y2="80" stroke="#0f172a" stroke-width="3" stroke-linecap="round"/><defs><linearGradient id="b4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="#3b82f6"/></linearGradient></defs></svg>
+    <div class="auth-screen" id="authScreen">
+        <div class="auth-left-panel" id="robotPanel">
+            <div class="video-robot-container" id="robotContainer">
+                <div class="robot-face-box">
+                    <div class="robot-eye" id="leftEye"></div>
+                    <div class="robot-eye" id="rightEye"></div>
+                </div>
+                <div class="robot-glow-dot"></div>
             </div>
         </div>
-        
-        <div class="auth-card">
-            <div class="auth-logo">
-                <img src="logo.svg" alt="Logo" />
-            </div>
-            <div class="auth-title" id="authTitle">Welcome to KayalFly</div>
-            <div class="auth-subtitle" id="authSubtitle">Log in to access your chat dashboard</div>
 
-            <div class="auth-input-group">
-                <label class="auth-input-label">Email Address</label>
-                <input type="email" id="authEmail" class="auth-input" placeholder="you@gmail.com">
-            </div>
-            <div class="auth-input-group">
-                <label class="auth-input-label">Password</label>
-                <input type="password" id="authPassword" class="auth-input" placeholder="••••••••">
-            </div>
-            
-            <div class="auth-success-msg" id="emailSuccess"></div>
-            
-            <button class="auth-btn" id="emailSubmitBtn" onclick="handleEmailAuth()">Log in</button>
+        <div class="auth-right-panel">
+            <div class="auth-card">
+                <div class="auth-logo-badge">
+                    <img src="logo.svg" alt="KayalFly Logo" />
+                </div>
+                <div class="auth-title" id="authTitle">Welcome back!</div>
+                <div class="auth-subtitle" id="authSubtitle">Enter your login details</div>
 
-            <button class="auth-btn auth-btn-google" onclick="handleGoogleLogin()">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.14v3.15C3.16 21.37 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.38-1.49-.38-2.25s.13-1.53.38-2.25V6.6H1.14C.41 8.08 0 9.74 0 12s.41 3.92 1.14 5.4l4.14-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.63 1.14 6.6l4.14 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/></svg>
-                Continue with Google
-            </button>
+                <div id="loginFormSection">
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Email</label>
+                        <input type="email" id="authEmail" class="auth-input" placeholder="you@example.com">
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Password</label>
+                        <input type="password" id="authPassword" class="auth-input" placeholder="••••••••">
+                    </div>
 
-            <div class="auth-guest-link-container">
-                <button class="auth-guest-link" onclick="continueAsGuest()">Continue as Guest</button>
-            </div>
+                    <!-- Confirm Password field specifically styled/hidden based on mode -->
+                    <div class="auth-input-group" id="confirmPasswordGroup" style="display: none;">
+                        <label class="auth-input-label">Confirm Password</label>
+                        <input type="password" id="authConfirmPassword" class="auth-input" placeholder="••••••••">
+                    </div>
 
-            <div class="auth-switch-text">
-                <span id="authSwitchPrompt">Need an account?</span> 
-                <button class="auth-switch-btn" onclick="toggleAuthMode()" id="authSwitchLink">Sign up</button>
+                    <div class="auth-row-options" id="authRowOptions">
+                        <label class="auth-checkbox-label">
+                            <input type="checkbox" id="rememberMe"> Remember me
+                        </label>
+                        <button class="auth-forgot-link" onclick="switchToForgotMode()">Forgot password?</button>
+                    </div>
+                    
+                    <div class="auth-success-msg" id="emailSuccess"></div>
+                    
+                    <button class="auth-btn" id="emailSubmitBtn" onclick="handleEmailAuth()">Log in</button>
+
+                    <div class="auth-divider" id="authDividerSection">Or</div>
+
+                    <div class="auth-social-row" id="authSocialRow">
+                        <button class="auth-social-btn" onclick="handleGoogleLogin()">
+                            <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.14v3.15C3.16 21.37 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.38-1.49-.38-2.25s.13-1.53.38-2.25V6.6H1.14C.41 8.08 0 9.74 0 12s.41 3.92 1.14 5.4l4.14-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.63 1.14 6.6l4.14 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/></svg>
+                            Google
+                        </button>
+                        <button class="auth-social-btn" onclick="continueAsGuest()">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                            Guest
+                        </button>
+                    </div>
+
+                    <div class="auth-switch-text">
+                        <span id="authSwitchPrompt">Don't have an account?</span> 
+                        <button class="auth-switch-btn" onclick="toggleAuthMode()" id="authSwitchLink">Sign Up</button>
+                    </div>
+                </div>
+
+                <div id="forgotFormSection" style="display: none;">
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Registered Email</label>
+                        <input type="email" id="forgotEmail" class="auth-input" placeholder="you@example.com">
+                    </div>
+                    <div class="auth-success-msg" id="forgotSuccess" style="display:block; color:#2563eb; background:#eff6ff;">Enter your email to receive a password reset link.</div>
+                    
+                    <button class="auth-btn" id="forgotSubmitBtn" onclick="handleForgotPasswordRequest()" style="margin-top: 10px;">Send Reset Link</button>
+                    
+                    <div style="text-align: center; margin-top: 16px;">
+                        <button class="auth-forgot-link" onclick="switchToLoginMode()" style="font-weight: 600;">Back to Log in</button>
+                    </div>
+                </div>
+
+                <!-- Update Password Section (When user clicks reset email link) -->
+                <div id="updatePasswordSection" style="display: none;">
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">New Password</label>
+                        <input type="password" id="newResetPassword" class="auth-input" placeholder="••••••••">
+                    </div>
+                    <div class="auth-input-group">
+                        <label class="auth-input-label">Confirm New Password</label>
+                        <input type="password" id="confirmResetPassword" class="auth-input" placeholder="••••••••">
+                    </div>
+                    <div class="auth-success-msg" id="updatePasswordSuccess"></div>
+                    <button class="auth-btn" onclick="handleUpdatePassword()">Update Password & Login</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- 2. One-Time Onboarding Modal -->
     <div class="modal-overlay" id="onboardingModal">
         <div class="modal-content">
             <div class="modal-title">Tell us about yourself</div>
@@ -341,7 +474,6 @@
         </div>
     </div>
 
-    <!-- 3. Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <div class="modal-title">Settings</div>
@@ -362,11 +494,21 @@
                 </select>
             </div>
             <button class="modal-btn" onclick="saveSettingsModal()">Save Changes</button>
-            <button class="modal-btn modal-logout-btn" onclick="logoutUser()">Log out</button>
+            <button class="modal-btn modal-logout-btn" onclick="promptLogoutConfirmation()">Log out</button>
         </div>
     </div>
 
-    <!-- 4. Main App Dashboard -->
+    <div class="modal-overlay" id="logoutConfirmModal">
+        <div class="modal-content">
+            <div class="modal-title">Log out?</div>
+            <div class="modal-subtitle">Are you sure you want to log out of KayalFly?</div>
+            <div class="modal-btn-row">
+                <button class="modal-btn modal-btn-secondary" onclick="closeLogoutConfirmation()">Cancel</button>
+                <button class="modal-btn modal-logout-btn" onclick="confirmLogoutUser()">Log out</button>
+            </div>
+        </div>
+    </div>
+
     <div class="app-dashboard" id="appDashboard">
         <div class="sidebar" id="sidebar">
             <div class="sidebar-top-row">
@@ -468,7 +610,6 @@
         </div>
     </div>
 
-    <!-- 5. Guest Limit Exceeded Modal -->
     <div class="modal-overlay" id="guestLimitModal">
         <div class="modal-content">
             <div class="modal-title">Limit Reached</div>
@@ -478,18 +619,16 @@
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBO9hdNUxIiiSwqNuY3oxk9MsTMnY4aIuQ",
-            authDomain: "kayalgpt.firebaseapp.com",
-            projectId: "kayalgpt",
-            storageBucket: "kayalgpt.firebasestorage.app",
-            messagingSenderId: "850068749865",
-            appId: "1:850068749865:web:824879058c7e93f4a92638",
-            measurementId: "G-XZT7H4ZE4Q"
-        };
+        const supabaseUrl = 'https://pfwhkslvxlgvhoajbhjx.supabase.co';
+        const supabaseKey = 'sb_publishable_jpxrk6jG2d19A1SNh0iUZw_ssdQN9Ni';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey, {
+            auth: {
+                persistSession: true,
+                autoRefreshToken: true,
+                detectSessionInUrl: true
+            }
+        });
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
         let isSignUpMode = false;
         let isGenerating = false;
         let activeTypewriterTimeout = null;
@@ -498,12 +637,24 @@
         let isGuestMode = false;
         let guestChatCount = 0;
 
-        function updateGeminiCursor(e) {
-            const glow = document.getElementById('geminiGlow');
-            if (glow) {
-                glow.style.left = e.clientX + 'px';
-                glow.style.top = e.clientY + 'px';
-            }
+        function trackCursorForRobot(e) {
+            const leftEye = document.getElementById('leftEye');
+            const rightEye = document.getElementById('rightEye');
+            const container = document.getElementById('robotContainer');
+            if (!leftEye || !rightEye || !container) return;
+
+            const rect = container.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
+            const distance = Math.min(5, Math.hypot(e.clientX - centerX, e.clientY - centerY) / 25);
+
+            const moveX = Math.cos(angle) * distance;
+            const moveY = Math.sin(angle) * distance;
+
+            leftEye.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            rightEye.style.transform = `translate(${moveX}px, ${moveY}px)`;
         }
 
         function continueAsGuest() {
@@ -537,7 +688,7 @@
             isSignUpMode = false;
             updateAuthScreenUI();
             isGuestMode = false;
-            auth.signOut();
+            supabaseClient.auth.signOut();
         }
 
         function triggerRegisterFromModal() {
@@ -547,35 +698,279 @@
             isSignUpMode = true;
             updateAuthScreenUI();
             isGuestMode = false;
-            auth.signOut();
+            supabaseClient.auth.signOut();
         }
 
         function updateAuthScreenUI() {
-            document.getElementById('authTitle').innerText = isSignUpMode ? "Create Account" : "Welcome to KayalFly";
-            document.getElementById('authSubtitle').innerText = isSignUpMode ? "Sign up to receive email verification link" : "Log in to access your chat dashboard";
+            document.getElementById('authTitle').innerText = isSignUpMode ? "Create account" : "Welcome back!";
+            document.getElementById('authSubtitle').innerText = isSignUpMode ? "Sign up with password & confirm password" : "Enter your login details";
             document.getElementById('emailSubmitBtn').innerText = isSignUpMode ? "Sign up" : "Log in";
-            document.getElementById('authSwitchPrompt').innerText = isSignUpMode ? "Already have an account?" : "Need an account?";
+            document.getElementById('authSwitchPrompt').innerText = isSignUpMode ? "Already have an account?" : "Don't have an account?";
             document.getElementById('authSwitchLink').innerText = isSignUpMode ? "Log in" : "Sign up";
+            
+            // Show/Hide Confirm Password field specifically during Sign Up mode
+            const confirmGrp = document.getElementById('confirmPasswordGroup');
+            const rowOpts = document.getElementById('authRowOptions');
+            const divider = document.getElementById('authDividerSection');
+            const socialRow = document.getElementById('authSocialRow');
+
+            if (isSignUpMode) {
+                confirmGrp.style.display = 'block';
+                rowOpts.style.display = 'none';
+                divider.style.display = 'none';
+                socialRow.style.display = 'none';
+            } else {
+                confirmGrp.style.display = 'none';
+                rowOpts.style.display = 'flex';
+                divider.style.display = 'flex';
+                socialRow.style.display = 'flex';
+            }
             document.getElementById('emailSuccess').style.display = "none";
         }
 
-        auth.onAuthStateChanged(async (user) => {
-            if (isGuestMode) return;
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            updateAuthScreenUI();
+        }
+
+        function switchToForgotMode() {
+            document.getElementById('loginFormSection').style.display = 'none';
+            document.getElementById('forgotFormSection').style.display = 'block';
+            document.getElementById('authTitle').innerText = "Reset Password";
+            document.getElementById('authSubtitle').innerText = "Enter your email to receive a reset link";
+        }
+
+        function switchToLoginMode() {
+            document.getElementById('forgotFormSection').style.display = 'none';
+            document.getElementById('loginFormSection').style.display = 'block';
+            updateAuthScreenUI();
+        }
+
+        async function handleForgotPasswordRequest() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            const successMsg = document.getElementById('forgotSuccess');
+            if (!email) {
+                successMsg.style.color = "#dc2626";
+                successMsg.style.background = "#ffeeee";
+                successMsg.innerText = "Please enter your registered email address.";
+                return;
+            }
+            try {
+                const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin,
+                });
+                if (error) throw error;
+                successMsg.style.color = "#16a34a";
+                successMsg.style.background = "#f0fdf4";
+                successMsg.innerText = "Email sended successfully! Check your inbox for the reset link.";
+            } catch (err) {
+                successMsg.style.color = "#dc2626";
+                successMsg.style.background = "#ffeeee";
+                successMsg.innerText = "Error: " + err.message;
+            }
+        }
+
+        async function handleEmailAuth() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+            const successDiv = document.getElementById('emailSuccess');
+            successDiv.style.display = "none";
+
+            if (!email || !password) { 
+                successDiv.style.color = "#dc2626";
+                successDiv.style.background = "#ffeeee";
+                successDiv.innerText = "Please fill in all fields."; 
+                successDiv.style.display = "block"; 
+                return; 
+            }
+
+            try {
+                if (isSignUpMode) {
+                    const confirmPassword = document.getElementById('authConfirmPassword').value;
+                    
+                    // Password Mismatch Validation Check
+                    if (password !== confirmPassword) {
+                        successDiv.style.color = "#dc2626";
+                        successDiv.style.background = "#ffeeee";
+                        successDiv.innerText = "Password mismatch! Both passwords must be same.";
+                        successDiv.style.display = "block";
+                        return;
+                    }
+
+                    const { data, error } = await supabaseClient.auth.signUp({ email, password });
+                    if (error) throw error;
+                    
+                    successDiv.style.color = "#16a34a";
+                    successDiv.style.background = "#f0fdf4";
+                    successDiv.innerText = "Email sended successfully! Check your email inbox to verify your account.";
+                    successDiv.style.display = "block";
+                } else {
+                    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                    if (error) throw error;
+                    if (data?.session?.user) {
+                        handleSessionUser(data.session.user);
+                    }
+                }
+            } catch (error) {
+                successDiv.style.color = "#dc2626";
+                successDiv.style.background = "#ffeeee";
+                successDiv.innerText = "Notice: " + error.message;
+                successDiv.style.display = "block";
+            }
+        }
+
+        async function handleUpdatePassword() {
+            const newPass = document.getElementById('newResetPassword').value;
+            const confirmPass = document.getElementById('confirmResetPassword').value;
+            const msgDiv = document.getElementById('updatePasswordSuccess');
+            msgDiv.style.display = "block";
+
+            if (newPass !== confirmPass) {
+                msgDiv.style.color = "#dc2626";
+                msgDiv.style.background = "#ffeeee";
+                msgDiv.innerText = "Password mismatch! Please make sure both fields match.";
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
+                if (error) throw error;
+                msgDiv.style.color = "#16a34a";
+                msgDiv.style.background = "#f0fdf4";
+                msgDiv.innerText = "Password updated successfully! Logging you in...";
+                setTimeout(() => {
+                    window.location.href = window.location.pathname;
+                }, 1500);
+            } catch (err) {
+                msgDiv.style.color = "#dc2626";
+                msgDiv.style.background = "#ffeeee";
+                msgDiv.innerText = "Error: " + err.message;
+            }
+        }
+
+        async function handleGoogleLogin() {
+            try { 
+                const { data, error } = await supabaseClient.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin,
+                        queryParams: { prompt: 'select_account' }
+                    }
+                });
+                if (error) throw error;
+            } catch (error) {
+                const successDiv = document.getElementById('emailSuccess');
+                successDiv.innerText = "Google Sign-In Error: " + error.message;
+                successDiv.style.display = "block";
+            }
+        }
+
+        function promptLogoutConfirmation() {
+            closeSettingsModal();
+            document.getElementById('logoutConfirmModal').classList.add('active');
+        }
+
+        function closeLogoutConfirmation() {
+            document.getElementById('logoutConfirmModal').classList.remove('active');
+        }
+
+        async function confirmLogoutUser() {
+            closeLogoutConfirmation();
+            isGuestMode = false;
+            await supabaseClient.auth.signOut();
+            currentUserUid = null;
+            currentUserEmail = null;
+            
+            document.getElementById('appDashboard').classList.remove('active');
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('onboardingModal').classList.remove('active');
+            sessions = [];
+            renderHistory();
+        }
+
+        function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
+        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
+        
+        function changeTheme(themeName) {
+            if (themeName === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+            else document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('kayalfly_theme', themeName);
+        }
+
+        const savedTheme = localStorage.getItem('kayalfly_theme') || 'light';
+        document.getElementById('settingTheme').value = savedTheme;
+        changeTheme(savedTheme);
+
+        const webhookUrl = 'https://somasri.app.n8n.cloud/webhook/63151488-03ad-4429-8a3a-dce3ab6c302c/chat';
+        const emailWebhookUrl = 'https://somasri.app.n8n.cloud/webhook/send-email';
+        
+        let sessions = [];
+        let currentSessionId = null;
+        let selectedImageFile = null;
+        let selectedImageBase64 = null;
+        let currentTab = 'recent';
+        let recognition = null;
+        let isLiveVoiceMode = false;
+        let continuousRecognition = null;
+
+        async function initAuthListener() {
+            // Check if user came from a recovery/reset password link or email verification link
+            if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery'))) {
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = hashParams.get('access_token');
+                const refreshToken = hashParams.get('refresh_token');
+                const type = hashParams.get('type');
+                
+                if (accessToken) {
+                    const { data, error } = await supabaseClient.auth.setSession({
+                        access_token: accessToken,
+                        refresh_token: refreshToken
+                    });
+                    if (!error && data?.session) {
+                        if (type === 'recovery') {
+                            // Show Update Password Form for reset flow
+                            document.getElementById('loginFormSection').style.display = 'none';
+                            document.getElementById('forgotFormSection').style.display = 'none';
+                            document.getElementById('updatePasswordSection').style.display = 'block';
+                            document.getElementById('authTitle').innerText = "Create New Password";
+                            document.getElementById('authSubtitle').innerText = "Email verified successfully! Please enter your new password.";
+                            return;
+                        } else {
+                            // Email verified notification handling
+                            window.history.replaceState({}, document.title, window.location.pathname);
+                            handleSessionUser(data.session.user);
+                            return;
+                        }
+                    }
+                }
+            }
+
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) {
+                    await supabaseClient.auth.signOut();
+                    handleSessionUser(null);
+                    return;
+                }
+                handleSessionUser(session?.user || null);
+            } catch (err) {
+                await supabaseClient.auth.signOut();
+                handleSessionUser(null);
+            }
+
+            supabaseClient.auth.onAuthStateChange(async (_event, session) => {
+                if (isGuestMode) return;
+                handleSessionUser(session?.user || null);
+            });
+        }
+
+        function handleSessionUser(user) {
             const authScreen = document.getElementById('authScreen');
             const appDashboard = document.getElementById('appDashboard');
             const onboardingModal = document.getElementById('onboardingModal');
-            
+
             if (user) {
-                if (user.providerData.some(p => p.providerId === 'password')) {
-                    await user.reload();
-                    if (!user.emailVerified) {
-                        auth.signOut();
-                        authScreen.classList.remove('hidden');
-                        appDashboard.classList.remove('active');
-                        return;
-                    }
-                }
-                currentUserUid = user.uid;
+                currentUserUid = user.id;
                 currentUserEmail = user.email || "user@kayalfly.com";
                 authScreen.classList.add('hidden');
                 appDashboard.classList.add('active');
@@ -613,7 +1008,9 @@
                     renderHistory();
                 }
             }
-        });
+        }
+
+        initAuthListener();
 
         function applyPersonalizedWelcome(profile) {
             const welcomeEl = document.getElementById('welcomeMsg');
@@ -644,85 +1041,6 @@
             closeSettingsModal();
         }
 
-        function toggleAuthMode() {
-            isSignUpMode = !isSignUpMode;
-            updateAuthScreenUI();
-        }
-
-        async function handleEmailAuth() {
-            const email = document.getElementById('authEmail').value.trim();
-            const password = document.getElementById('authPassword').value;
-            const successDiv = document.getElementById('emailSuccess');
-            successDiv.style.display = "none";
-            if (!email || !password) { successDiv.innerText = "Please fill in all fields."; successDiv.style.display = "block"; return; }
-            try {
-                if (isSignUpMode) {
-                    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                    await userCredential.user.sendEmailVerification();
-                    auth.signOut();
-                    successDiv.innerText = "Verification link sent! Check your inbox, verify, and log in.";
-                    successDiv.style.display = "block";
-                } else {
-                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                    await userCredential.user.reload();
-                    if (!userCredential.user.emailVerified) {
-                        auth.signOut();
-                        successDiv.innerText = "Email not verified! Check your inbox first.";
-                        successDiv.style.display = "block";
-                    }
-                }
-            } catch (error) {
-                successDiv.innerText = "Notice: " + error.message;
-                successDiv.style.display = "block";
-            }
-        }
-
-        async function handleGoogleLogin() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            provider.setCustomParameters({ prompt: 'select_account' });
-            try { 
-                // Reverted back to popup method to avoid sessionStorage storage partition errors in mobile WebViews
-                await auth.signInWithPopup(provider);
-            } catch (error) {
-                const successDiv = document.getElementById('emailSuccess');
-                if (error.code === 'auth/cancelled-popup-request' || error.code === 'auth/popup-closed-by-user') {
-                    return;
-                }
-                successDiv.innerText = "Google Sign-In Error: " + error.message;
-                successDiv.style.display = "block";
-            }
-        }
-
-        async function logoutUser() { 
-            closeSettingsModal(); 
-            isGuestMode = false;
-            await auth.signOut(); 
-        }
-        function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
-        function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
-        
-        function changeTheme(themeName) {
-            if (themeName === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-            else document.documentElement.removeAttribute('data-theme');
-            localStorage.setItem('kayalfly_theme', themeName);
-        }
-
-        const savedTheme = localStorage.getItem('kayalfly_theme') || 'light';
-        document.getElementById('settingTheme').value = savedTheme;
-        changeTheme(savedTheme);
-
-        const webhookUrl = 'https://somasri.app.n8n.cloud/webhook/63151488-03ad-4429-8a3a-dce3ab6c302c/chat';
-        const emailWebhookUrl = 'https://somasri.app.n8n.cloud/webhook/send-email';
-        
-        let sessions = [];
-        let currentSessionId = null;
-        let selectedImageFile = null;
-        let selectedImageBase64 = null;
-        let currentTab = 'recent';
-        let recognition = null;
-        let isLiveVoiceMode = false;
-        let continuousRecognition = null;
-
         function loadUserSessions() {
             if (!currentUserUid) return;
             const storageKey = `kayalfly_sessions_${currentUserUid}`;
@@ -748,7 +1066,7 @@
             const rec = new SpeechRecognition();
             rec.continuous = false;
             rec.interimResults = false;
-            rec.lang = document.getElementById('settingLang')?.value === 'ta' ? 'ta-IN' : 'en-US';
+            rec.lang = 'en-US';
             return rec;
         }
 
@@ -1004,17 +1322,16 @@
         function renderMarkdown(text) {
             if (typeof marked !== 'undefined') {
                 let html = marked.parse(text);
-                
                 html = html.replace(/<pre><code[\s\S]*?>([\s\S]*?)<\/code><\/pre>/g, function(match, codeContent) {
                     return `<div class="code-container">
-                                <div class="code-header-bar">
-                                    <span>Code</span>
-                                    <div class="code-header-btns">
-                                        <button class="code-btn" onclick="copyCode(this)">Copy</button>
-                                    </div>
+                            <div class="code-header-bar">
+                                <span>Code</span>
+                                <div class="code-header-btns">
+                                    <button class="code-btn" onclick="copyCode(this)">Copy</button>
                                 </div>
-                                ${match}
-                            </div>`;
+                            </div>
+                            ${match}
+                        </div>`;
                 });
                 setTimeout(() => { document.querySelectorAll('pre code').forEach((el) => { hljs.highlightElement(el); }); }, 50);
                 return html;
