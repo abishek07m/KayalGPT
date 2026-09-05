@@ -386,7 +386,6 @@
                         <input type="password" id="authPassword" class="auth-input" placeholder="••••••••">
                     </div>
 
-                    <!-- Confirm Password field specifically styled/hidden based on mode -->
                     <div class="auth-input-group" id="confirmPasswordGroup" style="display: none;">
                         <label class="auth-input-label">Confirm Password</label>
                         <input type="password" id="authConfirmPassword" class="auth-input" placeholder="••••••••">
@@ -427,7 +426,7 @@
                         <label class="auth-input-label">Registered Email</label>
                         <input type="email" id="forgotEmail" class="auth-input" placeholder="you@example.com">
                     </div>
-                    <div class="auth-success-msg" id="forgotSuccess" style="display:block; color:#2563eb; background:#eff6ff;">Enter your email to receive a password reset link.</div>
+                    <div class="auth-success-msg" id="forgotSuccess" style="display:block; color:#2563eb; background:#eff6ff;">Enter your email to receive a reset link.</div>
                     
                     <button class="auth-btn" id="forgotSubmitBtn" onclick="handleForgotPasswordRequest()" style="margin-top: 10px;">Send Reset Link</button>
                     
@@ -436,7 +435,6 @@
                     </div>
                 </div>
 
-                <!-- Update Password Section (When user clicks reset email link) -->
                 <div id="updatePasswordSection" style="display: none;">
                     <div class="auth-input-group">
                         <label class="auth-input-label">New Password</label>
@@ -708,7 +706,6 @@
             document.getElementById('authSwitchPrompt').innerText = isSignUpMode ? "Already have an account?" : "Don't have an account?";
             document.getElementById('authSwitchLink').innerText = isSignUpMode ? "Log in" : "Sign up";
             
-            // Show/Hide Confirm Password field specifically during Sign Up mode
             const confirmGrp = document.getElementById('confirmPasswordGroup');
             const rowOpts = document.getElementById('authRowOptions');
             const divider = document.getElementById('authDividerSection');
@@ -788,7 +785,6 @@
                 if (isSignUpMode) {
                     const confirmPassword = document.getElementById('authConfirmPassword').value;
                     
-                    // Password Mismatch Validation Check
                     if (password !== confirmPassword) {
                         successDiv.style.color = "#dc2626";
                         successDiv.style.background = "#ffeeee";
@@ -854,7 +850,10 @@
                     provider: 'google',
                     options: {
                         redirectTo: window.location.origin,
-                        queryParams: { prompt: 'select_account' }
+                        queryParams: {
+                            access_type: 'offline',
+                            prompt: 'consent'
+                        }
                     }
                 });
                 if (error) throw error;
@@ -914,7 +913,6 @@
         let continuousRecognition = null;
 
         async function initAuthListener() {
-            // Check if user came from a recovery/reset password link or email verification link
             if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery'))) {
                 const hashParams = new URLSearchParams(window.location.hash.substring(1));
                 const accessToken = hashParams.get('access_token');
@@ -928,7 +926,6 @@
                     });
                     if (!error && data?.session) {
                         if (type === 'recovery') {
-                            // Show Update Password Form for reset flow
                             document.getElementById('loginFormSection').style.display = 'none';
                             document.getElementById('forgotFormSection').style.display = 'none';
                             document.getElementById('updatePasswordSection').style.display = 'block';
@@ -936,7 +933,6 @@
                             document.getElementById('authSubtitle').innerText = "Email verified successfully! Please enter your new password.";
                             return;
                         } else {
-                            // Email verified notification handling
                             window.history.replaceState({}, document.title, window.location.pathname);
                             handleSessionUser(data.session.user);
                             return;
