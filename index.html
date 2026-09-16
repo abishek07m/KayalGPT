@@ -1,3091 +1,1516 @@
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
-
     <title>KayalFly</title>
-
     <link rel="icon" type="image/svg+xml" href="logo.svg">
-
     <script src="https://unpkg.com/marked@12.0.0/lib/marked.umd.js"></script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <style>
-
         :root {
-
             --bg-sidebar: #f9f9f9;
-
             --bg-main: #ffffff;
-
             --bg-input: #f4f4f6;
-
             --text-main: #0d0d0d;
-
             --text-secondary: #676767;
-
             --border-color: #e5e5e7;
-
             --accent-color: #000000;
-
             --accent-hover: #333333;
-
         }
-
-
 
         [data-theme="dark"] {
-
             --bg-sidebar: #171717;
-
             --bg-main: #212121;
-
             --bg-input: #2f2f2f;
-
             --text-main: #ececec;
-
             --text-secondary: #b4b4b4;
-
             --border-color: #383838;
-
             --accent-color: #ffffff;
-
             --accent-hover: #d1d1d1;
-
         }
-
         
-
         * { 
-
             box-sizing: border-box; 
-
             margin: 0; 
-
             padding: 0; 
-
             font-family: 'Söhne', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-
             -webkit-font-smoothing: antialiased;
-
         }
-
         
-
         html, body { 
-
             width: 100%; 
-
             height: 100%; 
-
             margin: 0; 
-
             padding: 0; 
-
             background-color: var(--bg-main); 
-
             color: var(--text-main); 
-
             overflow: hidden; 
-
             position: fixed;
-
             touch-action: manipulation;
-
         }
-
-
 
         .auth-screen { display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; background-color: #ffffff; overflow: hidden; }
-
         .auth-screen.hidden { display: none; }
-
         
-
         .auth-left-panel {
-
             flex: 1.2;
-
             background-color: #000000;
-
             display: flex;
-
             flex-direction: column;
-
             justify-content: center;
-
             align-items: center;
-
             position: relative;
-
             overflow: hidden;
-
             height: 100%;
-
         }
-
-
 
         .video-robot-container {
-
             width: 160px;
-
             height: 160px;
-
             background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 70%);
-
             border: 2px solid rgba(255, 255, 255, 0.2);
-
             border-radius: 36px;
-
             display: flex;
-
             flex-direction: column;
-
             align-items: center;
-
             justify-content: center;
-
             position: relative;
-
             box-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
-
             transition: transform 0.08s ease-out;
-
         }
-
-
 
         .robot-face-box {
-
             width: 86px;
-
             height: 54px;
-
             border: 2.5px solid #ffffff;
-
             border-radius: 14px;
-
             display: flex;
-
             align-items: center;
-
             justify-content: space-around;
-
             padding: 0 10px;
-
             position: relative;
-
             background: rgba(0, 0, 0, 0.4);
-
             box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.2);
-
         }
-
-
 
         .robot-eye {
-
             width: 12px;
-
             height: 16px;
-
             background: #ffffff;
-
             border-radius: 3px;
-
             position: relative;
-
             box-shadow: 0 0 10px #ffffff;
-
             transition: transform 0.04s ease-out;
-
         }
-
-
 
         .robot-glow-dot {
-
             width: 70px;
-
             height: 16px;
-
             background: rgba(255, 255, 255, 0.35);
-
             filter: blur(12px);
-
             margin-top: 20px;
-
             border-radius: 50%;
-
         }
-
-
 
         .auth-right-panel {
-
             flex: 1;
-
             background-color: #ffffff;
-
             display: flex;
-
             flex-direction: column;
-
             justify-content: center;
-
             align-items: center;
-
             padding: 24px;
-
             height: 100%;
-
             overflow-y: auto;
-
             -webkit-overflow-scrolling: touch;
-
         }
-
-
 
         .auth-card { 
-
             width: 100%; 
-
             max-width: 360px; 
-
             text-align: left; 
-
             position: relative; 
-
             margin: auto; 
-
         }
-
-
 
         .auth-logo-badge {
-
             width: 44px;
-
             height: 44px;
-
             margin-bottom: 18px;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
         }
-
         .auth-logo-badge img {
-
             width: 100%;
-
             height: 100%;
-
             object-fit: contain;
-
         }
-
-
 
         .auth-title { font-size: 26px; font-weight: 700; margin-bottom: 4px; color: #000000; letter-spacing: -0.5px; }
-
         .auth-subtitle { font-size: 13.5px; color: #666666; margin-bottom: 22px; }
-
         
-
         .auth-input-group { text-align: left; margin-bottom: 14px; }
-
         .auth-input-label { font-size: 12.5px; font-weight: 600; margin-bottom: 5px; display: block; color: #111111; }
-
         .auth-input { width: 100%; padding: 12px 14px; border: 1px solid #dcdcdc; background: #fafafa; color: #000000; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.2s; }
-
         .auth-input:focus { border-color: #000000; background: #ffffff; }
 
-
-
         .auth-row-options {
-
             display: flex;
-
             justify-content: space-between;
-
             align-items: center;
-
             font-size: 13px;
-
             margin-bottom: 18px;
-
             color: #444444;
-
         }
-
         
-
         .auth-checkbox-label { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-
         .auth-forgot-link { background: none; border: none; color: #444444; font-size: 13px; cursor: pointer; text-decoration: none; font-weight: 500; }
-
         .auth-forgot-link:hover { text-decoration: underline; }
 
-
-
         .auth-btn { width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 14.5px; font-weight: 600; cursor: pointer; background: #000000; color: #ffffff; transition: background 0.2s; }
-
         .auth-btn:hover { background: #222222; }
 
-
-
         .auth-divider {
-
             display: flex;
-
             align-items: center;
-
             text-align: center;
-
             margin: 18px 0;
-
             color: #888888;
-
             font-size: 13px;
-
         }
-
         .auth-divider::before, .auth-divider::after {
-
             content: '';
-
             flex: 1;
-
             border-bottom: 1px solid #eaeaea;
-
         }
-
         .auth-divider::before { margin-right: .75em; }
-
         .auth-divider::after { margin-left: .75em; }
 
-
-
         .auth-social-row {
-
             display: flex;
-
             gap: 10px;
-
             margin-bottom: 18px;
-
         }
-
-
 
         .auth-social-btn {
-
             flex: 1;
-
             padding: 10px;
-
             border: 1px solid #dcdcdc;
-
             background: #ffffff;
-
             border-radius: 10px;
-
             cursor: pointer;
-
             display: flex;
-
             align-items: center;
-
             justify-content: center;
-
             gap: 6px;
-
             font-size: 13px;
-
             font-weight: 500;
-
             color: #000000;
-
             transition: background 0.2s;
-
         }
-
         .auth-social-btn:hover { background: #f5f5f5; }
 
-
-
         .auth-success-msg { color: #16a34a; font-size: 13px; font-weight: 600; margin-top: 8px; background: #f0fdf4; padding: 8px; border-radius: 6px; display: none; }
-
         
-
         .auth-switch-text { font-size: 13.5px; color: #666666; text-align: center; margin-top: 6px; }
-
         .auth-switch-btn { color: #000000; background: none; border: none; cursor: pointer; font-weight: 700; text-decoration: underline; margin-left: 4px; }
 
-
-
         @media (max-width: 768px) {
-
             .auth-screen { flex-direction: column; overflow-y: auto; position: absolute; }
-
             .auth-left-panel { display: none !important; }
-
             .auth-right-panel { width: 100%; height: 100%; padding: 24px 16px; justify-content: center; }
-
             .auth-card { max-width: 100%; }
-
         }
 
-
-
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); z-index: 2000; justify-content: center; align-items: center; padding: 16px; }
-
         .modal-overlay.active { display: flex; }
-
         .modal-content { background: var(--bg-main); width: 100%; max-width: 380px; border-radius: 18px; padding: 22px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); text-align: center; border: 1px solid var(--border-color); }
-
         .modal-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; color: var(--text-main); }
-
         .modal-subtitle { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
-
         .modal-input-group { text-align: left; margin-bottom: 12px; }
-
         .modal-input-label { font-size: 11px; font-weight: 600; margin-bottom: 3px; display: block; color: var(--text-secondary); }
-
         .modal-input, .modal-select { width: 100%; padding: 10px 12px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); border-radius: 10px; font-size: 13.5px; outline: none; }
-
         .modal-btn { width: 100%; padding: 11px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; background-color: var(--accent-color); color: var(--bg-main); }
-
         .modal-btn:hover { opacity: 0.9; }
-
         .modal-logout-btn { background-color: #ef4444; color: #ffffff; margin-top: 12px; }
-
         .modal-btn-row { display: flex; gap: 8px; margin-top: 14px; }
-
         .modal-btn-secondary { background: var(--bg-input); color: var(--text-main); border: 1px solid var(--border-color); }
 
-
-
         .app-dashboard { display: none; width: 100%; height: 100vh; position: relative; }
-
         .app-dashboard.active { display: flex; }
 
-
-
         .sidebar { width: 260px; background-color: var(--bg-sidebar); display: flex; flex-direction: column; padding: 12px; border-right: 1px solid var(--border-color); position: fixed; top: 0; left: 0; height: 100%; z-index: 100; transition: transform 0.3s ease; }
-
         .sidebar.hidden { transform: translateX(-100%); }
-
         .sidebar-top-row { display: flex; align-items: center; justify-content: space-between; padding: 4px; margin-bottom: 4px; }
-
         .sidebar-brand-group { display: flex; align-items: center; gap: 10px; }
-
         .ai-logo-icon { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
         .ai-logo-icon img { width: 100%; height: 100%; object-fit: contain; }
-
         .sidebar-brand-name { font-size: 15.5px; font-weight: 600; color: var(--text-main); }
-
         .search-icon-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 6px; border-radius: 8px; }
-
         .search-container { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
-
         .search-container.active { max-height: 50px; margin-bottom: 8px; }
-
         .search-box { width: 100%; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; color: var(--text-main); font-size: 13.5px; outline: none; }
 
-
-
         .new-chat-pill-btn { background-color: #000000; color: #ffffff; border: none; padding: 10px 14px; border-radius: 20px; text-align: center; cursor: pointer; font-size: 13.5px; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
-
         [data-theme="dark"] .new-chat-pill-btn { background-color: #ffffff; color: #000000; }
 
-
-
         .sidebar-tabs { display: flex; gap: 6px; margin-top: 10px; margin-bottom: 8px; }
-
         .sidebar-tab { background: transparent; border: none; color: var(--text-secondary); font-size: 13px; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-weight: 500; }
-
         .sidebar-tab.active { background: rgba(0,0,0,0.06); color: var(--text-main); }
-
         .history-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
-
         .history-item { position: relative; padding: 8px 10px; font-size: 13.5px; color: var(--text-secondary); border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-
         .history-item:hover { background-color: rgba(0,0,0,0.04); color: var(--text-main); }
-
         .history-item.active { background-color: rgba(0,0,0,0.07); color: var(--text-main); font-weight: 500; }
-
         .history-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
-
         .dots-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 2px 6px; opacity: 0; }
-
         .history-item:hover .dots-btn { opacity: 1; }
-
         .history-dropdown { display: none; position: absolute; right: 8px; top: 32px; background: var(--bg-main); border: 1px solid var(--border-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 10; min-width: 110px; overflow: hidden; }
-
         .history-dropdown button { width: 100%; background: transparent; border: none; color: var(--text-main); padding: 8px 12px; text-align: left; font-size: 12.5px; cursor: pointer; display: block; }
-
         .history-dropdown button:hover { background: var(--border-color); }
 
-
-
         .sidebar-footer { border-top: 1px solid var(--border-color); padding: 12px 8px; margin-top: auto; background: var(--bg-sidebar); }
-
         .sidebar-user-row { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; }
-
         .sidebar-user-info { display: flex; align-items: center; gap: 10px; font-size: 13.5px; font-weight: 500; color: var(--text-main); overflow: hidden; }
-
         .user-avatar { width: 28px; height: 28px; border-radius: 50%; background-color: var(--accent-color); color: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
-
         .user-email-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px; }
-
         .settings-icon-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; padding: 6px; }
-
         
-
         .guest-sidebar-btns { display: flex; gap: 5px; align-items: center; }
-
         .guest-auth-action-btn { background: var(--accent-color); color: var(--bg-main); border: none; font-size: 11px; font-weight: 600; padding: 5px 8px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
-
         .guest-reg-action-btn { background: transparent; color: var(--text-main); border: 1px solid var(--border-color); font-size: 11px; font-weight: 600; padding: 5px 8px; border-radius: 10px; cursor: pointer; white-space: nowrap; }
 
-
-
         .chat-area { display: flex; flex-direction: column; width: 100%; height: 100vh; padding-left: 260px; background-color: var(--bg-main); transition: padding-left 0.3s ease; }
-
         .chat-area.expanded { padding-left: 0; }
-
         .chat-header { padding: 16px 20px; font-size: 15.5px; font-weight: 600; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: var(--bg-main); flex-shrink: 0; }
-
         .header-left { display: flex; align-items: center; gap: 12px; }
-
         .menu-toggle { background: transparent; border: none; color: var(--text-main); cursor: pointer; padding: 6px; border-radius: 8px; }
-
         .header-title { display: flex; align-items: center; gap: 10px; }
-
         
-
         .header-right-btns { display: flex; align-items: center; gap: 8px; }
-
         .export-btn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 12.5px; padding: 6px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
         .model-name { color: var(--text-secondary); font-size: 12px; font-weight: 600; background: var(--bg-input); padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border-color); flex-shrink: 0; }
 
-
-
         .finding-container { display: flex; align-items: center; gap: 12px; font-size: 15.5px; font-weight: 700; color: var(--text-main); }
-
         .rotating-logo { width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
         .rotating-logo img { width: 100%; height: 100%; object-fit: contain; }
 
-
-
         .messages-container-wrapper { position: relative; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-
         .messages-container { flex: 1; overflow-y: auto; padding: 24px 16px; display: flex; flex-direction: column; gap: 28px; align-items: center; width: 100%; }
-
         .scroll-bottom-btn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border-color); border-radius: 50%; width: 38px; height: 38px; display: none; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 10; }
 
-
-
         .message-wrapper { width: 100%; max-width: 768px; display: flex; flex-direction: column; gap: 8px; font-size: 15.5px; line-height: 1.65; position: relative; margin: 0 auto; padding: 0 12px; }
-
         .message-wrapper.user { align-items: flex-end; }
-
         .message-wrapper.ai { align-items: flex-start; }
-
         .message { padding: 2px 0; width: 100%; word-break: break-word; color: var(--text-main); }
-
         .message-wrapper.user .message { background-color: var(--bg-input); padding: 12px 18px; border-radius: 20px; max-width: 85%; white-space: pre-wrap; }
-
         .message img { max-width: 220px; border-radius: 10px; display: block; }
-
         .edit-btn { position: absolute; right: calc(85% + 15px); top: 5px; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: none; font-size: 12.5px; }
-
         .message-wrapper.user:hover .edit-btn { display: block; }
 
-
-
         .ai-message-actions { display: flex; gap: 6px; align-items: center; margin-top: 8px; color: var(--text-secondary); }
-
         .ai-action-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 6px; transition: background 0.2s, color 0.2s; }
-
         .ai-action-btn:hover { background: var(--bg-input); color: var(--text-main); }
-
         .ai-action-btn.active { color: var(--accent-color); }
-
-
 
         .message a { color: #1a73e8; text-decoration: underline; font-weight: 500; }
 
-
-
         .song-player-box { margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); max-width: 360px; background: #000; }
-
         .song-player-box iframe { width: 100%; height: 200px; border: none; display: block; }
 
-
-
         .code-container { position: relative; margin: 12px 0; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid #333; background: #1e1e1e; }
-
         .code-header-bar { background: #282828; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #b4b4b4; font-weight: 600; border-bottom: 1px solid #333; }
-
         .code-header-btns { display: flex; gap: 6px; align-items: center; }
-
         .code-btn { background: transparent; border: none; color: #b4b4b4; cursor: pointer; font-size: 11.5px; padding: 3px 6px; border-radius: 4px; }
-
         .message pre { background-color: #1e1e1e; padding: 14px; overflow-x: auto; margin: 0; }
-
         .message pre code { font-family: ui-monospace, monospace; font-size: 13.5px; color: #abb2bf; }
-
         .message p { margin-bottom: 10px; }
 
-
-
         .input-container { padding: 0 16px 20px 16px; display: flex; flex-direction: column; align-items: center; background: linear-gradient(transparent, var(--bg-main) 60%); flex-shrink: 0; width: 100%; }
-
         .input-toolbar-row { width: 100%; max-width: 768px; display: flex; justify-content: flex-end; align-items: center; margin: 0 auto 6px auto; padding: 0 6px; }
-
         .live-voice-btn-toolbar { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); font-size: 12.5px; padding: 5px 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-weight: 500; width: auto; max-width: max-content; }
-
         .live-voice-btn-toolbar.active { background: var(--accent-color); color: var(--bg-main); }
 
-
-
         .input-box { width: 100%; max-width: 768px; background-color: var(--bg-input); border-radius: 28px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--border-color); margin: 0 auto; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
-
         .icon-btn-left { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
         .input-box textarea { flex: 1; background: transparent; border: none; color: var(--text-main); font-size: 15px; resize: none; outline: none; height: 24px; max-height: 150px; line-height: 1.5; padding-top: 3px; }
-
         .input-right-actions { display: flex; align-items: center; gap: 6px; }
-
         .icon-btn, .send-btn, .stop-btn { background: transparent; border: none; color: var(--text-secondary); cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-
         .icon-btn.listening { color: #ef4444; }
-
         .send-btn { background-color: var(--accent-color); color: var(--bg-main); }
-
         .stop-btn { background-color: var(--accent-color); color: var(--bg-main); display: none; }
 
-
-
         .image-preview-container { width: 100%; max-width: 768px; display: none; padding: 8px 16px 0 16px; align-items: center; gap: 10px; margin: 0 auto; }
-
         .image-preview-container img { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); }
-
         .remove-img-btn { background: #ddd; color: #333; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; }
-
         .disclaimer { font-size: 11.5px; color: var(--text-secondary); margin-top: 10px; text-align: center; width: 100%; }
 
-
-
         @media (max-width: 768px) {
-
             .sidebar { transform: translateX(-100%); z-index: 101; }
-
             .sidebar.mobile-open { transform: translateX(0); }
-
             .chat-area { padding-left: 0; }
-
         }
-
     </style>
-
 </head>
-
 <body onmousemove="trackCursorForRobot(event)">
 
-
-
     <div class="auth-screen" id="authScreen">
-
         <div class="auth-left-panel" id="robotPanel">
-
             <div class="video-robot-container" id="robotContainer">
-
                 <div class="robot-face-box">
-
                     <div class="robot-eye" id="leftEye"></div>
-
                     <div class="robot-eye" id="rightEye"></div>
-
                 </div>
-
                 <div class="robot-glow-dot"></div>
-
             </div>
-
         </div>
 
-
-
         <div class="auth-right-panel">
-
             <div class="auth-card">
-
                 <div class="auth-logo-badge">
-
                     <img src="logo.svg" alt="KayalFly Logo" />
-
                 </div>
-
                 <div class="auth-title" id="authTitle">Welcome back!</div>
-
                 <div class="auth-subtitle" id="authSubtitle">Enter your login details</div>
 
-
-
                 <div id="loginFormSection">
-
                     <div class="auth-input-group">
-
                         <label class="auth-input-label">Email</label>
-
                         <input type="email" id="authEmail" class="auth-input" placeholder="you@example.com">
-
                     </div>
-
                     <div class="auth-input-group">
-
                         <label class="auth-input-label">Password</label>
-
                         <input type="password" id="authPassword" class="auth-input" placeholder="••••••••">
-
                     </div>
-
-
 
                     <div class="auth-input-group" id="confirmPasswordGroup" style="display: none;">
-
                         <label class="auth-input-label">Confirm Password</label>
-
                         <input type="password" id="authConfirmPassword" class="auth-input" placeholder="••••••••">
-
                     </div>
-
-
 
                     <div class="auth-row-options" id="authRowOptions">
-
                         <label class="auth-checkbox-label">
-
                             <input type="checkbox" id="rememberMe"> Remember me
-
                         </label>
-
                         <button class="auth-forgot-link" onclick="switchToForgotMode()">Forgot password?</button>
-
                     </div>
-
                     
-
                     <div class="auth-success-msg" id="emailSuccess"></div>
-
                     
-
                     <button class="auth-btn" id="emailSubmitBtn" onclick="handleEmailAuth()">Log in</button>
-
-
 
                     <div class="auth-divider" id="authDividerSection">Or</div>
 
-
-
                     <div class="auth-social-row" id="authSocialRow">
-
                         <button class="auth-social-btn" onclick="handleGoogleLogin()">
-
                             <svg width="15" height="15" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.95H1.14v3.15C3.16 21.37 7.23 24 12 24z"/><path fill="#FBBC05" d="M5.28 14.25c-.25-.72-.38-1.49-.38-2.25s.13-1.53.38-2.25V6.6H1.14C.41 8.08 0 9.74 0 12s.41 3.92 1.14 5.4l4.14-3.15z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.23 0 3.16 2.63 1.14 6.6l4.14 3.15c.95-2.84 3.6-4.95 6.72-4.95z"/></svg>
-
                             Google
-
                         </button>
-
                         <button class="auth-social-btn" onclick="continueAsGuest()">
-
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-
                             Guest
-
                         </button>
-
                     </div>
-
-
 
                     <div class="auth-switch-text">
-
                         <span id="authSwitchPrompt">Don't have an account?</span> 
-
                         <button class="auth-switch-btn" onclick="toggleAuthMode()" id="authSwitchLink">Sign Up</button>
-
                     </div>
-
                 </div>
-
-
 
                 <div id="forgotFormSection" style="display: none;">
-
                     <div class="auth-input-group">
-
                         <label class="auth-input-label">Registered Email</label>
-
                         <input type="email" id="forgotEmail" class="auth-input" placeholder="you@example.com">
-
                     </div>
-
                     <div class="auth-success-msg" id="forgotSuccess" style="display:block; color:#2563eb; background:#eff6ff;">Enter your email to receive a reset link.</div>
-
                     
-
                     <button class="auth-btn" id="forgotSubmitBtn" onclick="handleForgotPasswordRequest()" style="margin-top: 10px;">Send Reset Link</button>
-
                     
-
                     <div style="text-align: center; margin-top: 16px;">
-
                         <button class="auth-forgot-link" onclick="switchToLoginMode()" style="font-weight: 600;">Back to Log in</button>
-
                     </div>
-
                 </div>
-
-
 
                 <div id="updatePasswordSection" style="display: none;">
-
                     <div class="auth-input-group">
-
                         <label class="auth-input-label">New Password</label>
-
                         <input type="password" id="newResetPassword" class="auth-input" placeholder="••••••••">
-
                     </div>
-
                     <div class="auth-input-group">
-
                         <label class="auth-input-label">Confirm New Password</label>
-
                         <input type="password" id="confirmResetPassword" class="auth-input" placeholder="••••••••">
-
                     </div>
-
                     <div class="auth-success-msg" id="updatePasswordSuccess"></div>
-
                     <button class="auth-btn" onclick="handleUpdatePassword()">Update Password & Login</button>
-
                 </div>
-
             </div>
-
         </div>
-
     </div>
-
-
 
     <div class="modal-overlay" id="onboardingModal">
-
         <div class="modal-content">
-
             <div class="modal-title">Tell us about yourself</div>
-
             <div class="modal-subtitle">Help KayalFly personalize your experience</div>
-
             <div class="modal-input-group">
-
                 <label class="modal-input-label">Your Name</label>
-
                 <input type="text" id="onboardName" class="modal-input" placeholder="e.g. Somasriabishek">
-
             </div>
-
             <div class="modal-input-group">
-
                 <label class="modal-input-label">I am a...</label>
-
                 <select id="onboardRole" class="modal-select">
-
                     <option value="Student">Student</option>
-
                     <option value="Developer">Developer</option>
-
                     <option value="Professional">Professional</option>
-
                     <option value="Creator">Creator / Other</option>
-
                 </select>
-
             </div>
-
             <button class="modal-btn" onclick="saveOnboardingData()">Get Started</button>
-
         </div>
-
     </div>
-
-
 
     <div class="modal-overlay" id="settingsModal">
-
         <div class="modal-content">
-
             <div class="modal-title">Settings</div>
-
             <div class="modal-subtitle">Manage your KayalFly account & preferences</div>
-
             <div class="modal-input-group">
-
                 <label class="modal-input-label">Account Email</label>
-
                 <input type="text" id="settingEmail" class="modal-input" readonly>
-
             </div>
-
             <div class="modal-input-group">
-
                 <label class="modal-input-label">Edit Name</label>
-
                 <input type="text" id="settingNameInput" class="modal-input" placeholder="Your Name">
-
             </div>
-
             <div class="modal-input-group">
-
                 <label class="modal-input-label">Appearance / Theme</label>
-
                 <select id="settingTheme" class="modal-select" onchange="changeTheme(this.value)">
-
                     <option value="light">Light Mode</option>
-
                     <option value="dark">Dark Mode</option>
-
                 </select>
-
             </div>
-
             <button class="modal-btn" onclick="saveSettingsModal()">Save Changes</button>
-
             <button class="modal-btn modal-logout-btn" onclick="promptLogoutConfirmation()">Log out</button>
-
         </div>
-
     </div>
-
-
 
     <div class="modal-overlay" id="logoutConfirmModal">
-
         <div class="modal-content">
-
             <div class="modal-title">Log out?</div>
-
             <div class="modal-subtitle">Are you sure you want to log out of KayalFly?</div>
-
             <div class="modal-btn-row">
-
                 <button class="modal-btn modal-btn-secondary" onclick="closeLogoutConfirmation()">Cancel</button>
-
                 <button class="modal-btn modal-logout-btn" onclick="confirmLogoutUser()">Log out</button>
-
             </div>
-
         </div>
-
     </div>
-
-
 
     <div class="app-dashboard" id="appDashboard">
-
         <div class="sidebar" id="sidebar">
-
             <div class="sidebar-top-row">
-
                 <div class="sidebar-brand-group">
-
                     <div class="ai-logo-icon"><img src="logo.svg" alt="Logo" /></div>
-
                     <span class="sidebar-brand-name">KayalFly</span>
-
                 </div>
-
                 <button class="search-icon-btn" onclick="toggleSearchBox()" title="Search Chats">
-
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-
                 </button>
-
             </div>
-
-
 
             <div class="search-container" id="searchContainer">
-
                 <input type="text" class="search-box" id="searchChats" placeholder="Search chats..." oninput="filterHistory(this.value)">
-
             </div>
-
-
 
             <button class="new-chat-pill-btn" onclick="startNewChat()">
-
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-
                 New chat
-
             </button>
-
             
-
             <div class="sidebar-tabs">
-
                 <button class="sidebar-tab active" id="tabRecent" onclick="switchTab('recent')">Recents</button>
-
                 <button class="sidebar-tab" id="tabImages" onclick="switchTab('images')">Images</button>
-
             </div>
-
             <div class="history-list" id="historyList"></div>
 
-
-
             <div class="sidebar-footer">
-
                 <div class="sidebar-user-row" id="sidebarUserRowContainer"></div>
-
             </div>
-
         </div>
-
-
 
         <div class="chat-area" id="chatArea">
-
             <div class="chat-header">
-
                 <div class="header-left">
-
                     <button class="menu-toggle" id="menuToggleBtn" onclick="toggleSidebar(event)">
-
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-
                     </button>
-
                     <div class="header-title">
-
                         <div class="ai-logo-icon" style="width:22px; height:22px;"><img src="logo.svg" alt="Logo" /></div>
-
                         <span>KayalFly</span>
-
                     </div>
-
                 </div>
-
                 <div class="header-right-btns">
-
                     <button class="export-btn" onclick="exportChatTXT()" title="Export Chat">
-
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-
                         Export
-
                     </button>
-
                     <div class="model-name">ABI PRO</div>
-
                 </div>
-
             </div>
-
-
 
             <div class="messages-container-wrapper">
-
                 <div class="messages-container" id="chatMessages" onscroll="checkScrollPosition()">
-
                     <div class="message-wrapper ai">
-
                         <div class="message" id="welcomeMsg">Hello, how can I help you today?</div>
-
                     </div>
-
                 </div>
-
                 <button class="scroll-bottom-btn" id="scrollBottomBtn" onclick="scrollToBottom()">
-
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-
                 </button>
-
             </div>
-
-
 
             <div class="input-container">
-
                 <div class="image-preview-container" id="imagePreviewContainer">
-
                     <img id="imagePreview" src="" alt="preview">
-
                     <button class="remove-img-btn" onclick="removeImage()">×</button>
-
                 </div>
-
-
 
                 <div class="input-toolbar-row">
-
                     <button class="live-voice-btn-toolbar" id="liveVoiceBtn" onclick="toggleLiveVoiceMode()">
-
                         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path></svg>
-
                         <span id="liveVoiceText">Live Voice: OFF</span>
-
                     </button>
-
                 </div>
-
-
 
                 <div class="input-box">
-
                     <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
-
                     <button class="icon-btn-left" onclick="document.getElementById('imageInput').click()" title="Upload Image">
-
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-
                     </button>
-
-
 
                     <textarea id="userInput" rows="1" placeholder="Ask KayalFly..."></textarea>
-
                     
-
                     <div class="input-right-actions">
-
                         <button class="icon-btn" id="micBtn" onclick="toggleSpeechInput()" title="Voice Input">
-
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path></svg>
-
                         </button>
-
                         <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg>
-
                         </button>
-
                         <button class="stop-btn" id="stopBtn" onclick="stopGenerating()" title="Stop">
-
                             <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"></rect></svg>
-
                         </button>
-
                     </div>
-
                 </div>
-
                 <div class="disclaimer">KayalFly is AI and can make mistakes.</div>
-
             </div>
-
         </div>
-
     </div>
-
-
 
     <div class="modal-overlay" id="guestLimitModal">
-
         <div class="modal-content">
-
             <div class="modal-title">Limit Reached</div>
-
             <div class="modal-subtitle">Please log in or sign up to continue chatting.</div>
-
             <button class="modal-btn" onclick="triggerLoginFromModal()">Log in / Sign up</button>
-
         </div>
-
     </div>
 
-
-
     <script>
-
         const supabaseUrl = 'https://pfwhkslvxlgvhoajbhjx.supabase.co';
-
         const supabaseKey = 'sb_publishable_jpxrk6jG2d19A1SNh0iUZw_ssdQN9Ni';
-
         const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey, {
-
             auth: {
-
                 persistSession: true,
-
                 autoRefreshToken: true,
-
                 detectSessionInUrl: true
-
             }
-
         });
 
-
-
         let isSignUpMode = false;
-
         let isGenerating = false;
-
         let activeTypewriterTimeout = null;
-
         let currentUserUid = null;
-
         let currentUserEmail = null;
-
         let isGuestMode = false;
-
         let guestChatCount = 0;
 
-
-
         function trackCursorForRobot(e) {
-
             const leftEye = document.getElementById('leftEye');
-
             const rightEye = document.getElementById('rightEye');
-
             const container = document.getElementById('robotContainer');
-
             if (!leftEye || !rightEye || !container) return;
 
-
-
             const rect = container.getBoundingClientRect();
-
             const centerX = rect.left + rect.width / 2;
-
             const centerY = rect.top + rect.height / 2;
 
-
-
             const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-
             const distance = Math.min(5, Math.hypot(e.clientX - centerX, e.clientY - centerY) / 25);
 
-
-
             const moveX = Math.cos(angle) * distance;
-
             const moveY = Math.sin(angle) * distance;
 
-
-
             leftEye.style.transform = `translate(${moveX}px, ${moveY}px)`;
-
             rightEye.style.transform = `translate(${moveX}px, ${moveY}px)`;
-
         }
-
-
 
         function continueAsGuest() {
-
             isGuestMode = true;
-
             guestChatCount = 0;
-
             currentUserUid = 'guest_user';
-
             currentUserEmail = 'guest@kayalfly.com';
-
             
-
             document.getElementById('authScreen').classList.add('hidden');
-
             document.getElementById('appDashboard').classList.add('active');
-
             
-
             document.getElementById('sidebarUserRowContainer').innerHTML = `
-
                 <div class="sidebar-user-info">
-
                     <div class="user-avatar">G</div>
-
                     <span class="user-email-text">Guest User</span>
-
                 </div>
-
                 <div class="guest-sidebar-btns">
-
                     <button class="guest-auth-action-btn" onclick="triggerLoginFromModal()">Login</button>
-
                     <button class="guest-reg-action-btn" onclick="triggerRegisterFromModal()">Register</button>
-
                 </div>
-
             `;
-
             
-
             applyPersonalizedWelcome({ name: "Guest" });
-
             loadUserSessions();
-
         }
-
-
 
         function triggerLoginFromModal() {
-
             document.getElementById('guestLimitModal').classList.remove('active');
-
             document.getElementById('appDashboard').classList.remove('active');
-
             document.getElementById('authScreen').classList.remove('hidden');
-
             isSignUpMode = false;
-
             updateAuthScreenUI();
-
             isGuestMode = false;
-
             supabaseClient.auth.signOut();
-
         }
-
-
 
         function triggerRegisterFromModal() {
-
             document.getElementById('guestLimitModal').classList.remove('active');
-
             document.getElementById('appDashboard').classList.remove('active');
-
             document.getElementById('authScreen').classList.remove('hidden');
-
             isSignUpMode = true;
-
             updateAuthScreenUI();
-
             isGuestMode = false;
-
             supabaseClient.auth.signOut();
-
         }
-
-
 
         function updateAuthScreenUI() {
-
             document.getElementById('authTitle').innerText = isSignUpMode ? "Create account" : "Welcome back!";
-
             document.getElementById('authSubtitle').innerText = isSignUpMode ? "Sign up with password & confirm password" : "Enter your login details";
-
             document.getElementById('emailSubmitBtn').innerText = isSignUpMode ? "Sign up" : "Log in";
-
             document.getElementById('authSwitchPrompt').innerText = isSignUpMode ? "Already have an account?" : "Don't have an account?";
-
             document.getElementById('authSwitchLink').innerText = isSignUpMode ? "Log in" : "Sign up";
-
             
-
             const confirmGrp = document.getElementById('confirmPasswordGroup');
-
             const rowOpts = document.getElementById('authRowOptions');
-
             const divider = document.getElementById('authDividerSection');
-
             const socialRow = document.getElementById('authSocialRow');
 
-
-
             if (isSignUpMode) {
-
                 confirmGrp.style.display = 'block';
-
                 rowOpts.style.display = 'none';
-
                 divider.style.display = 'none';
-
                 socialRow.style.display = 'none';
-
             } else {
-
                 confirmGrp.style.display = 'none';
-
                 rowOpts.style.display = 'flex';
-
                 divider.style.display = 'flex';
-
                 socialRow.style.display = 'flex';
-
             }
-
             document.getElementById('emailSuccess').style.display = "none";
-
         }
-
-
 
         function toggleAuthMode() {
-
             isSignUpMode = !isSignUpMode;
-
             updateAuthScreenUI();
-
         }
-
-
 
         function switchToForgotMode() {
-
             document.getElementById('loginFormSection').style.display = 'none';
-
             document.getElementById('forgotFormSection').style.display = 'block';
-
             document.getElementById('authTitle').innerText = "Reset Password";
-
             document.getElementById('authSubtitle').innerText = "Enter your email to receive a reset link";
-
         }
-
-
 
         function switchToLoginMode() {
-
             document.getElementById('forgotFormSection').style.display = 'none';
-
             document.getElementById('loginFormSection').style.display = 'block';
-
             updateAuthScreenUI();
-
         }
-
-
 
         async function handleForgotPasswordRequest() {
-
             const email = document.getElementById('forgotEmail').value.trim();
-
             const successMsg = document.getElementById('forgotSuccess');
-
             if (!email) {
-
                 successMsg.style.color = "#dc2626";
-
                 successMsg.style.background = "#ffeeee";
-
                 successMsg.innerText = "Please enter your registered email address.";
-
                 return;
-
             }
-
             try {
-
                 const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-
-                    redirectTo: window.location.origin,
-
+                    redirectTo: 'https://kayal-gpt.vercel.app/',
                 });
-
                 if (error) throw error;
-
                 successMsg.style.color = "#16a34a";
-
                 successMsg.style.background = "#f0fdf4";
-
                 successMsg.innerText = "Email sended successfully! Check your inbox for the reset link.";
-
             } catch (err) {
-
                 successMsg.style.color = "#dc2626";
-
                 successMsg.style.background = "#ffeeee";
-
                 successMsg.innerText = "Error: " + err.message;
-
             }
-
         }
-
-
 
         async function handleEmailAuth() {
-
             const email = document.getElementById('authEmail').value.trim();
-
             const password = document.getElementById('authPassword').value;
-
             const successDiv = document.getElementById('emailSuccess');
-
             successDiv.style.display = "none";
 
-
-
             if (!email || !password) { 
-
                 successDiv.style.color = "#dc2626";
-
                 successDiv.style.background = "#ffeeee";
-
                 successDiv.innerText = "Please fill in all fields."; 
-
                 successDiv.style.display = "block"; 
-
                 return; 
-
             }
 
-
-
             try {
-
                 if (isSignUpMode) {
-
                     const confirmPassword = document.getElementById('authConfirmPassword').value;
-
                     
-
                     if (password !== confirmPassword) {
-
                         successDiv.style.color = "#dc2626";
-
                         successDiv.style.background = "#ffeeee";
-
                         successDiv.innerText = "Password mismatch! Both passwords must be same.";
-
                         successDiv.style.display = "block";
-
                         return;
-
                     }
-
-
 
                     const { data, error } = await supabaseClient.auth.signUp({ email, password });
-
                     if (error) throw error;
-
                     
-
                     successDiv.style.color = "#16a34a";
-
                     successDiv.style.background = "#f0fdf4";
-
                     successDiv.innerText = "Email sended successfully! Check your email inbox to verify your account.";
-
                     successDiv.style.display = "block";
-
                 } else {
-
                     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-
                     if (error) throw error;
-
                     if (data?.session?.user) {
-
                         handleSessionUser(data.session.user);
-
                     }
-
                 }
-
             } catch (error) {
-
                 successDiv.style.color = "#dc2626";
-
                 successDiv.style.background = "#ffeeee";
-
                 successDiv.innerText = "Notice: " + error.message;
-
                 successDiv.style.display = "block";
-
             }
-
         }
-
-
 
         async function handleUpdatePassword() {
-
             const newPass = document.getElementById('newResetPassword').value;
-
             const confirmPass = document.getElementById('confirmResetPassword').value;
-
             const msgDiv = document.getElementById('updatePasswordSuccess');
-
             msgDiv.style.display = "block";
 
-
-
             if (newPass !== confirmPass) {
-
                 msgDiv.style.color = "#dc2626";
-
                 msgDiv.style.background = "#ffeeee";
-
                 msgDiv.innerText = "Password mismatch! Please make sure both fields match.";
-
                 return;
-
             }
-
-
 
             try {
-
                 const { data, error } = await supabaseClient.auth.updateUser({ password: newPass });
-
                 if (error) throw error;
-
                 msgDiv.style.color = "#16a34a";
-
                 msgDiv.style.background = "#f0fdf4";
-
                 msgDiv.innerText = "Password updated successfully! Logging you in...";
-
                 setTimeout(() => {
-
                     window.location.href = window.location.pathname;
-
                 }, 1500);
-
             } catch (err) {
-
                 msgDiv.style.color = "#dc2626";
-
                 msgDiv.style.background = "#ffeeee";
-
                 msgDiv.innerText = "Error: " + err.message;
-
             }
-
         }
-
-
 
         async function handleGoogleLogin() {
-
             try { 
-
                 const { data, error } = await supabaseClient.auth.signInWithOAuth({
-
                     provider: 'google',
-
                     options: {
-
-                        redirectTo: window.location.origin,
-
+                        redirectTo: 'https://kayal-gpt.vercel.app/',
                         queryParams: {
-
                             access_type: 'offline',
-
                             prompt: 'consent'
-
                         }
-
                     }
-
                 });
-
                 if (error) throw error;
-
             } catch (error) {
-
                 const successDiv = document.getElementById('emailSuccess');
-
                 successDiv.innerText = "Google Sign-In Error: " + error.message;
-
                 successDiv.style.display = "block";
-
             }
-
         }
-
-
 
         function promptLogoutConfirmation() {
-
             closeSettingsModal();
-
             document.getElementById('logoutConfirmModal').classList.add('active');
-
         }
-
-
 
         function closeLogoutConfirmation() {
-
             document.getElementById('logoutConfirmModal').classList.remove('active');
-
         }
-
-
 
         async function confirmLogoutUser() {
-
             closeLogoutConfirmation();
-
             isGuestMode = false;
-
             await supabaseClient.auth.signOut();
-
             currentUserUid = null;
-
             currentUserEmail = null;
-
             
-
             document.getElementById('appDashboard').classList.remove('active');
-
             document.getElementById('authScreen').classList.remove('hidden');
-
             document.getElementById('onboardingModal').classList.remove('active');
-
             sessions = [];
-
             renderHistory();
-
         }
-
-
 
         function openSettingsModal() { document.getElementById('settingsModal').classList.add('active'); }
-
         function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('active'); }
-
         
-
         function changeTheme(themeName) {
-
             if (themeName === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-
             else document.documentElement.removeAttribute('data-theme');
-
             localStorage.setItem('kayalfly_theme', themeName);
-
         }
-
-
 
         const savedTheme = localStorage.getItem('kayalfly_theme') || 'light';
-
         document.getElementById('settingTheme').value = savedTheme;
-
         changeTheme(savedTheme);
 
-
-
         const webhookUrl = 'https://primary-production-7586c.up.railway.app/webhook/63151488-03ad-4429-8a3a-dce3ab6c302c/chat';
-
         const emailWebhookUrl = 'https://somasri.app.n8n.cloud/webhook/send-email';
-
         
-
         let sessions = [];
-
         let currentSessionId = null;
-
         let selectedImageFile = null;
-
         let selectedImageBase64 = null;
-
         let currentTab = 'recent';
-
         let recognition = null;
-
         let isLiveVoiceMode = false;
-
         let continuousRecognition = null;
 
-
-
         async function initAuthListener() {
-
-            if (window.location.hash && (window.location.hash.includes('access_token') || window.location.hash.includes('type=recovery'))) {
-
-                const hashParams = new URLSearchParams(window.location.hash.substring(1));
-
-                const accessToken = hashParams.get('access_token');
-
-                const refreshToken = hashParams.get('refresh_token');
-
-                const type = hashParams.get('type');
-
-                
-
-                if (accessToken) {
-
-                    const { data, error } = await supabaseClient.auth.setSession({
-
-                        access_token: accessToken,
-
-                        refresh_token: refreshToken
-
-                    });
-
-                    if (!error && data?.session) {
-
-                        if (type === 'recovery') {
-
-                            document.getElementById('loginFormSection').style.display = 'none';
-
-                            document.getElementById('forgotFormSection').style.display = 'none';
-
-                            document.getElementById('updatePasswordSection').style.display = 'block';
-
-                            document.getElementById('authTitle').innerText = "Create New Password";
-
-                            document.getElementById('authSubtitle').innerText = "Email verified successfully! Please enter your new password.";
-
-                            return;
-
-                        } else {
-
-                            window.history.replaceState({}, document.title, window.location.pathname);
-
-                            handleSessionUser(data.session.user);
-
-                            return;
-
-                        }
-
-                    }
-
-                }
-
-            }
-
-
-
-            try {
-
-                const { data: { session }, error } = await supabaseClient.auth.getSession();
-
-                if (error) {
-
-                    await supabaseClient.auth.signOut();
-
-                    handleSessionUser(null);
-
-                    return;
-
-                }
-
-                handleSessionUser(session?.user || null);
-
-            } catch (err) {
-
-                await supabaseClient.auth.signOut();
-
-                handleSessionUser(null);
-
-            }
-
-
-
+            // Supabase auth state change listener handles session updates automatically
             supabaseClient.auth.onAuthStateChange(async (_event, session) => {
-
                 if (isGuestMode) return;
-
                 handleSessionUser(session?.user || null);
-
             });
 
+            // Check current session on page load
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+                handleSessionUser(session?.user || null);
+            } catch (err) {
+                await supabaseClient.auth.signOut();
+                handleSessionUser(null);
+            }
         }
-
-
 
         function handleSessionUser(user) {
-
             const authScreen = document.getElementById('authScreen');
-
             const appDashboard = document.getElementById('appDashboard');
-
             const onboardingModal = document.getElementById('onboardingModal');
 
-
-
             if (user) {
-
                 currentUserUid = user.id;
-
                 currentUserEmail = user.email || "user@kayalfly.com";
-
                 authScreen.classList.add('hidden');
-
                 appDashboard.classList.add('active');
-
                 
-
                 document.getElementById('sidebarUserRowContainer').innerHTML = `
-
                     <div class="sidebar-user-info">
-
                         <div class="user-avatar" id="userAvatarText">${currentUserEmail.charAt(0).toUpperCase()}</div>
-
                         <span class="user-email-text" id="userEmailText">${currentUserEmail}</span>
-
                     </div>
-
                     <button class="settings-icon-btn" onclick="openSettingsModal()" title="Settings">
-
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-
                     </button>
-
                 `;
-
                 document.getElementById('settingEmail').value = currentUserEmail;
 
-
-
                 const profileKey = `kayalfly_profile_${currentUserUid}`;
-
                 const savedProfile = localStorage.getItem(profileKey);
-
                 
-
                 if (!savedProfile) {
-
                     onboardingModal.classList.add('active');
-
                 } else {
-
                     const prof = JSON.parse(savedProfile);
-
                     applyPersonalizedWelcome(prof);
-
                     document.getElementById('settingNameInput').value = prof.name;
-
                     loadUserSessions();
-
                 }
-
             } else {
-
                 if (!isGuestMode) {
-
                     currentUserUid = null;
-
                     currentUserEmail = null;
-
                     authScreen.classList.remove('hidden');
-
                     appDashboard.classList.remove('active');
-
                     onboardingModal.classList.remove('active');
-
                     sessions = [];
-
                     renderHistory();
-
                 }
-
             }
-
         }
-
-
 
         initAuthListener();
 
-
-
         function applyPersonalizedWelcome(profile) {
-
             const welcomeEl = document.getElementById('welcomeMsg');
-
             if (welcomeEl) welcomeEl.innerText = `Hello ${profile.name}, how can I help you today?`;
-
         }
-
-
 
         function saveOnboardingData() {
-
             const name = document.getElementById('onboardName').value.trim();
-
             const role = document.getElementById('onboardRole').value;
-
             if (!name) { alert('Please enter your name'); return; }
-
             const profile = { name, role };
-
             localStorage.setItem(`kayalfly_profile_${currentUserUid}`, JSON.stringify(profile));
-
             document.getElementById('onboardingModal').classList.remove('active');
-
             document.getElementById('settingNameInput').value = name;
-
             applyPersonalizedWelcome(profile);
-
             loadUserSessions();
-
         }
-
-
 
         function saveSettingsModal() {
-
             const newName = document.getElementById('settingNameInput').value.trim();
-
             if (newName && currentUserUid) {
-
                 const profileKey = `kayalfly_profile_${currentUserUid}`;
-
                 let profile = JSON.parse(localStorage.getItem(profileKey)) || {};
-
                 profile.name = newName;
-
                 localStorage.setItem(profileKey, JSON.stringify(profile));
-
                 applyPersonalizedWelcome(profile);
-
             }
-
             closeSettingsModal();
-
         }
-
-
 
         function loadUserSessions() {
-
             if (!currentUserUid) return;
-
             const storageKey = `kayalfly_sessions_${currentUserUid}`;
-
             sessions = JSON.parse(localStorage.getItem(storageKey)) || [];
-
             startNewChat();
-
         }
-
-
 
         function saveSessions() {
-
             if (!currentUserUid || isGuestMode) return;
-
             localStorage.setItem(`kayalfly_sessions_${currentUserUid}`, JSON.stringify(sessions));
-
         }
-
-
 
         function toggleSearchBox() {
-
             const sc = document.getElementById('searchContainer');
-
             sc.classList.toggle('active');
-
             if (sc.classList.contains('active')) document.getElementById('searchChats').focus();
-
             else { document.getElementById('searchChats').value = ''; filterHistory(''); }
-
         }
-
-
 
         function initSpeechRecognition() {
-
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
             if (!SpeechRecognition) return null;
-
             const rec = new SpeechRecognition();
-
             rec.continuous = false;
-
             rec.interimResults = false;
-
             rec.lang = 'en-US';
-
             return rec;
-
         }
-
-
 
         recognition = initSpeechRecognition();
-
         if (recognition) {
-
             recognition.onresult = function(event) {
-
                 const speechText = event.results[0][0].transcript;
-
                 const textareaEl = document.getElementById('userInput');
-
                 textareaEl.value = speechText;
-
                 textareaEl.style.height = (textareaEl.scrollHeight) + 'px';
-
                 document.getElementById('micBtn').classList.remove('listening');
-
                 if (isLiveVoiceMode) sendMessage(true);
-
             };
-
             recognition.onerror = () => document.getElementById('micBtn').classList.remove('listening');
-
             recognition.onend = () => document.getElementById('micBtn').classList.remove('listening');
-
         }
-
-
 
         function toggleLiveVoiceMode() {
-
             isLiveVoiceMode = !isLiveVoiceMode;
-
             const btn = document.getElementById('liveVoiceBtn');
-
             const btnText = document.getElementById('liveVoiceText');
-
             if (isLiveVoiceMode) {
-
                 btn.classList.add('active');
-
                 btnText.innerText = "Live Voice: ON";
-
                 startContinuousListening();
-
             } else {
-
                 btn.classList.remove('active');
-
                 btnText.innerText = "Live Voice: OFF";
-
                 if (continuousRecognition) try { continuousRecognition.stop(); } catch(e) {}
-
                 window.speechSynthesis.cancel();
-
             }
-
         }
-
-
 
         function startContinuousListening() {
-
             if (!isLiveVoiceMode) return;
-
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
             if (!SpeechRecognition) return;
-
             try {
-
                 continuousRecognition = new SpeechRecognition();
-
                 continuousRecognition.continuous = false;
-
                 continuousRecognition.interimResults = false;
-
                 continuousRecognition.onresult = function(event) {
-
                     const speechText = event.results[0][0].transcript;
-
                     document.getElementById('userInput').value = speechText;
-
                     if (speechText.trim() !== '') sendMessage(true);
-
                 };
-
                 continuousRecognition.onerror = () => { if (isLiveVoiceMode) setTimeout(startContinuousListening, 1200); };
-
                 continuousRecognition.onend = () => { if (isLiveVoiceMode && !window.speechSynthesis.speaking) setTimeout(() => { try { continuousRecognition.start(); } catch(e) {} }, 500); };
-
                 continuousRecognition.start();
-
             } catch(e) { if (isLiveVoiceMode) setTimeout(startContinuousListening, 1500); }
-
         }
-
-
 
         function speakText(text) {
-
             if ('speechSynthesis' in window) {
-
                 window.speechSynthesis.cancel();
-
                 const cleanText = text.replace(/[*#_`[\]()]/g, '');
-
                 const utterance = new SpeechSynthesisUtterance(cleanText);
-
                 utterance.rate = 1.05; utterance.pitch = 1.3;
-
                 utterance.onend = () => { if (isLiveVoiceMode) setTimeout(startContinuousListening, 600); };
-
                 window.speechSynthesis.speak(utterance);
-
             }
-
         }
-
-
 
         function toggleSpeechInput() {
-
             if (!recognition) { alert('Speech recognition not supported.'); return; }
-
             const micBtn = document.getElementById('micBtn');
-
             if (micBtn.classList.contains('listening')) { recognition.stop(); micBtn.classList.remove('listening'); }
-
             else { try { recognition.start(); micBtn.classList.add('listening'); } catch(e) { recognition = initSpeechRecognition(); if(recognition) recognition.start(); } }
-
         }
-
-
 
         const textarea = document.getElementById('userInput');
-
         textarea.addEventListener('input', function() { this.style.height = '24px'; this.style.height = (this.scrollHeight) + 'px'; });
-
         textarea.addEventListener('keydown', function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(isLiveVoiceMode); } });
 
-
-
         function toggleSidebar(event) {
-
             if (event) event.stopPropagation();
-
             const sidebar = document.getElementById('sidebar');
-
             const chatArea = document.getElementById('chatArea');
-
             if (window.innerWidth <= 768) {
-
                 sidebar.classList.toggle('mobile-open');
-
             } else {
-
                 sidebar.classList.toggle('hidden');
-
                 chatArea.classList.toggle('expanded');
-
             }
-
         }
-
-
 
         document.addEventListener('click', function(event) {
-
             const sidebar = document.getElementById('sidebar');
-
             const menuToggleBtn = document.getElementById('menuToggleBtn');
-
             if (window.innerWidth <= 768) {
-
                 if (sidebar.classList.contains('mobile-open') && !sidebar.contains(event.target) && !menuToggleBtn.contains(event.target)) {
-
                     sidebar.classList.remove('mobile-open');
-
                 }
-
             }
-
         });
 
-
-
         function handleImageSelect(event) {
-
             const file = event.target.files[0];
-
             if (file) {
-
                 selectedImageFile = file;
-
                 const reader = new FileReader();
-
                 reader.onload = function(e) {
-
                     selectedImageBase64 = e.target.result;
-
                     document.getElementById('imagePreview').src = selectedImageBase64;
-
                     document.getElementById('imagePreviewContainer').style.display = 'flex';
-
                 };
-
                 reader.readAsDataURL(file);
-
             }
-
         }
-
-
 
         function removeImage() {
-
             selectedImageFile = null; selectedImageBase64 = null;
-
             document.getElementById('imageInput').value = '';
-
             document.getElementById('imagePreviewContainer').style.display = 'none';
-
         }
-
-
 
         function startNewChat() {
-
             if (!currentUserUid) return;
-
             currentSessionId = 'session_' + Math.random().toString(36).substring(7);
-
             sessions.unshift({ id: currentSessionId, title: 'New Chat', messages: [], pinned: false });
-
             saveSessions(); renderHistory(); clearChatUI();
-
             
-
             textarea.value = '';
-
             textarea.style.height = '24px';
-
             removeImage();
 
-
-
             const sidebar = document.getElementById('sidebar');
-
             const chatArea = document.getElementById('chatArea');
-
             if (window.innerWidth <= 768) {
-
                 sidebar.classList.remove('mobile-open');
-
             } else {
-
                 sidebar.classList.add('hidden');
-
                 chatArea.classList.add('expanded');
-
             }
-
         }
-
-
 
         function clearChatUI() {
-
             const profileData = isGuestMode ? { name: "Guest" } : (JSON.parse(localStorage.getItem(`kayalfly_profile_${currentUserUid}`)) || { name: "User" });
-
             document.getElementById('chatMessages').innerHTML = `<div class="message-wrapper ai"><div class="message">Hello ${profileData.name}, how can I help you today?</div></div>`;
-
         }
-
-
 
         function switchTab(tab) {
-
             currentTab = tab;
-
             document.getElementById('tabRecent').classList.toggle('active', tab === 'recent');
-
             document.getElementById('tabImages').classList.toggle('active', tab === 'images');
-
             renderHistory();
-
         }
-
-
 
         function filterHistory(query) { renderHistory(query); }
 
-
-
         function toggleDropdown(event, sessionId) {
-
             event.stopPropagation();
-
             document.querySelectorAll('.history-dropdown').forEach(d => { if (d.id !== 'dropdown_' + sessionId) d.style.display = 'none'; });
-
             const dd = document.getElementById('dropdown_' + sessionId);
-
             if (dd) dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
-
         }
-
-
 
         function renameChat(sessionId) {
-
             const s = sessions.find(item => item.id === sessionId);
-
             if (!s) return;
-
             const newTitle = prompt("Enter new chat name:", s.title);
-
             if (newTitle && newTitle.trim() !== '') { s.title = newTitle.trim(); saveSessions(); renderHistory(); }
-
         }
-
-
 
         function deleteChat(sessionId) {
-
             sessions = sessions.filter(item => item.id !== sessionId);
-
             saveSessions();
-
             if (currentSessionId === sessionId) { if (sessions.length > 0) switchSession(sessions[0].id); else startNewChat(); }
-
             else renderHistory();
-
         }
-
-
 
         function pinChat(sessionId) {
-
             const s = sessions.find(item => item.id === sessionId);
-
             if (s) { s.pinned = !s.pinned; sessions.sort((a, b) => (b.pinned === true) - (a.pinned === true)); saveSessions(); renderHistory(); }
-
         }
-
-
 
         function renderHistory(searchQuery = '') {
-
             const list = document.getElementById('historyList');
-
             list.innerHTML = '';
-
             if (currentTab === 'recent') {
-
                 let filtered = sessions;
-
                 if (searchQuery.trim() !== '') filtered = sessions.filter(s => s.title.toLowerCase().includes(searchQuery.toLowerCase()));
-
                 filtered.forEach(s => {
-
                     const div = document.createElement('div');
-
                     div.className = `history-item ${s.id === currentSessionId ? 'active' : ''}`;
-
                     div.innerHTML = `<span class="history-title" onclick="switchSession('${s.id}')">${s.pinned ? '📌 ' : ''}${escapeHtml(s.title)}</span>
-
                         <div style="position:relative;">
-
                             <button class="dots-btn" onclick="toggleDropdown(event, '${s.id}')">⋮</button>
-
                             <div class="history-dropdown" id="dropdown_${s.id}">
-
                                 <button onclick="pinChat('${s.id}')">${s.pinned ? 'Unpin' : 'Pin'}</button>
-
                                 <button onclick="renameChat('${s.id}')">Rename</button>
-
                                 <button style="color:#ef4444;" onclick="deleteChat('${s.id}')">Delete</button>
-
                             </div>
-
                         </div>`;
-
                     list.appendChild(div);
-
                 });
-
             } else if (currentTab === 'images') {
-
                 let imageList = [];
-
                 sessions.forEach(s => { s.messages.forEach(m => { if (m.sender === 'user' && m.image) imageList.push({ sessionId: s.id, image: m.image, title: s.title }); }); });
-
                 if (imageList.length === 0) { list.innerHTML = `<div style="font-size:12px; color:var(--text-secondary); padding:10px; text-align:center;">No images uploaded</div>`; return; }
-
                 imageList.forEach(item => {
-
                     const imgDiv = document.createElement('div');
-
                     imgDiv.className = `history-item`;
-
                     imgDiv.style.cssText = 'display:flex; align-items:center; gap:8px;';
-
                     imgDiv.innerHTML = `<img src="${item.image}" style="width:24px; height:24px; object-fit:cover; border-radius:4px;"><span style="overflow:hidden; text-overflow:ellipsis; flex:1;">${escapeHtml(item.title)}</span>`;
-
                     imgDiv.onclick = () => { switchSession(item.sessionId); document.getElementById('imageInput').click(); };
-
                     list.appendChild(imgDiv);
-
                 });
-
             }
-
         }
-
-
 
         function createAiActions(textToCopy) {
-
             const escapedText = encodeURIComponent(textToCopy);
-
             return `<div class="ai-message-actions">
-
                 <button class="ai-action-btn" onclick="handleAiAction(this, 'like')" title="Like">
-
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
-
                 </button>
-
                 <button class="ai-action-btn" onclick="handleAiAction(this, 'dislike')" title="Dislike">
-
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"></path></svg>
-
                 </button>
-
                 <button class="ai-action-btn" onclick="copyAiMessage(this)" data-content="${escapedText}" title="Copy">
-
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-
                 </button>
-
                 <button class="ai-action-btn" onclick="shareAiMessage(this)" data-content="${escapedText}" title="Share">
-
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
-
                 </button>
-
             </div>`;
-
         }
-
-
 
         function handleAiAction(btn, type) {
-
             btn.parentElement.querySelectorAll('.ai-action-btn').forEach(b => { if(b === btn) b.classList.toggle('active'); else b.classList.remove('active'); });
-
         }
-
-
 
         function copyAiMessage(btn) {
-
             const text = decodeURIComponent(btn.getAttribute('data-content'));
-
             navigator.clipboard.writeText(text).then(() => {
-
                 const originalSvg = btn.innerHTML;
-
                 btn.innerHTML = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2ecc71" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-
                 setTimeout(() => { btn.innerHTML = originalSvg; }, 2000);
-
             });
-
         }
-
-
 
         function shareAiMessage(btn) {
-
             const text = decodeURIComponent(btn.getAttribute('data-content'));
-
             if (navigator.share) {
-
                 navigator.share({ title: 'KayalFly AI Response', text: text }).catch(() => {});
-
             } else {
-
                 navigator.clipboard.writeText(text);
-
                 alert('Response copied to clipboard for sharing!');
-
             }
-
         }
-
-
 
         function renderMarkdown(text) {
-
             if (typeof marked !== 'undefined') {
-
                 let html = marked.parse(text);
-
                 html = html.replace(/<pre><code[\s\S]*?>([\s\S]*?)<\/code><\/pre>/g, function(match, codeContent) {
-
                     return `<div class="code-container">
-
                             <div class="code-header-bar">
-
                                 <span>Code</span>
-
                                 <div class="code-header-btns">
-
                                     <button class="code-btn" onclick="copyCode(this)">Copy</button>
-
                                 </div>
-
                             </div>
-
                             ${match}
-
                         </div>`;
-
                 });
-
                 setTimeout(() => { document.querySelectorAll('pre code').forEach((el) => { hljs.highlightElement(el); }); }, 50);
-
                 return html;
-
             }
-
             return escapeHtml(text).replace(/\n/g, '<br>');
-
         }
-
-
 
         function checkScrollPosition() {
-
             const c = document.getElementById('chatMessages');
-
             document.getElementById('scrollBottomBtn').style.display = (c.scrollHeight - c.scrollTop - c.clientHeight > 150) ? 'flex' : 'none';
-
         }
-
-
 
         function scrollToBottom() { document.getElementById('chatMessages').scrollTop = document.getElementById('chatMessages').scrollHeight; }
 
-
-
         function exportChatTXT() {
-
             const s = sessions.find(item => item.id === currentSessionId);
-
             if (!s || s.messages.length === 0) { alert('No messages!'); return; }
-
             let text = `Title: ${s.title}\n\n`;
-
             s.messages.forEach(m => { text += `${m.sender === 'user' ? 'User' : 'KayalFly'}:\n${m.text}\n\n`; });
-
             const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-
             const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${s.title}_chat.txt`; a.click();
-
         }
-
-
 
         function copyCode(btn) {
-
             const code = btn.closest('.code-container').querySelector('code').innerText;
-
             navigator.clipboard.writeText(code).then(() => { btn.innerText = 'Copied'; setTimeout(() => btn.innerText = 'Copy', 2000); });
-
         }
-
-
 
         function switchSession(id) {
-
             currentSessionId = id;
-
             const s = sessions.find(item => item.id === id);
-
             if (!s) return;
-
             const container = document.getElementById('chatMessages');
-
             const profile = isGuestMode ? { name: "Guest" } : (JSON.parse(localStorage.getItem(`kayalfly_profile_${currentUserUid}`)) || { name: "User" });
-
             container.innerHTML = `<div class="message-wrapper ai"><div class="message">Hello ${profile.name}, how can I help you today?</div></div>`;
-
             s.messages.forEach((msg, idx) => {
-
                 if (msg.sender === 'user') {
-
                     let imgTag = msg.image ? `<img src="${msg.image}">` : '';
-
                     container.innerHTML += `<div class="message-wrapper user"><button class="edit-btn" onclick="editMessage(${idx})">Edit</button><div class="message">${imgTag}<span>${escapeHtml(msg.text)}</span></div></div>`;
-
                 } else {
-
                     container.innerHTML += `<div class="message-wrapper ai"><div class="message">${renderMarkdown(msg.text)}</div>${createAiActions(msg.text)}</div>`;
-
                 }
-
             });
-
             container.scrollTop = container.scrollHeight; renderHistory();
-
             if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('mobile-open');
-
         }
-
-
 
         function editMessage(idx) {
-
             const s = sessions.find(item => item.id === currentSessionId);
-
             if (s && s.messages[idx]?.sender === 'user') {
-
                 textarea.value = s.messages[idx].text;
-
                 textarea.style.height = (textarea.scrollHeight) + 'px';
-
                 textarea.focus();
-
             }
-
         }
-
-
 
         function setGeneratingState(active) {
-
             isGenerating = active;
-
             document.getElementById('sendBtn').style.display = active ? 'none' : 'flex';
-
             document.getElementById('stopBtn').style.display = active ? 'flex' : 'none';
-
         }
-
-
 
         function stopGenerating() {
-
             if (activeTypewriterTimeout) clearTimeout(activeTypewriterTimeout);
-
             setGeneratingState(false);
-
             document.getElementById('activeLoading')?.remove();
-
         }
 
-
-
         async function sendMessage(autoSpeak = false) {
-
             if (isGenerating) return;
 
-
-
             if (isGuestMode) {
-
                 if (guestChatCount >= 5) {
-
                     document.getElementById('guestLimitModal').classList.add('active');
-
                     return;
-
                 }
-
                 guestChatCount++;
-
             }
 
-
-
             const rawText = textarea.value.trim();
-
             const currentImgFile = selectedImageFile;
-
             const currentImgBase64 = selectedImageBase64;
-
             if (!rawText && !currentImgFile) return;
 
-
-
             let session = sessions.find(item => item.id === currentSessionId);
-
             if (!session) return;
-
-
 
             if (session.title === 'New Chat' && rawText) session.title = rawText.length > 25 ? rawText.substring(0, 25) + '...' : rawText;
 
-
-
             const emailMatch = rawText.match(/^!sendto\s+([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})\s+(.+)$/);
-
             if (emailMatch && currentUserEmail && !isGuestMode) {
-
                 const toEmail = emailMatch[1];
-
                 const emailMessage = emailMatch[2];
-
                 session.messages.push({ sender: 'user', text: rawText });
-
                 saveSessions(); renderHistory();
-
                 
-
                 const container = document.getElementById('chatMessages');
-
                 container.innerHTML += `<div class="message-wrapper user"><div class="message"><span>${escapeHtml(rawText)}</span></div></div>`;
-
                 textarea.value = ''; textarea.style.height = '24px';
-
                 container.scrollTop = container.scrollHeight;
-
-
 
                 try {
-
                     await fetch(emailWebhookUrl, {
-
                         method: 'POST',
-
                         headers: { 'Content-Type': 'application/json' },
-
                         body: JSON.stringify({ toEmail, chatMessage: emailMessage, fromEmail: currentUserEmail, appName: "KayalFly" })
-
                     });
-
                     const aiReply = "Email sent successfully to " + toEmail + " via KayalFly.";
-
                     session.messages.push({ sender: 'ai', text: aiReply });
-
                     saveSessions();
-
                     container.innerHTML += `<div class="message-wrapper ai"><div class="message">${renderMarkdown(aiReply)}</div>${createAiActions(aiReply)}</div>`;
-
                 } catch(e) {
-
                     container.innerHTML += `<div class="message-wrapper ai"><div class="message">Error sending email.</div></div>`;
-
                 }
-
                 return;
-
             }
-
-
 
             const lowerQuery = rawText.toLowerCase();
-
             if (lowerQuery.includes('song') || lowerQuery.includes('paatu') || lowerQuery.includes('play')) {
-
                 session.messages.push({ sender: 'user', text: rawText, image: currentImgBase64 });
-
                 saveSessions(); renderHistory();
-
                 const container = document.getElementById('chatMessages');
-
                 container.innerHTML += `<div class="message-wrapper user"><div class="message"><span>${escapeHtml(rawText)}</span></div></div>`;
-
                 textarea.value = ''; textarea.style.height = '24px'; removeImage();
-
                 
-
                 const songReply = `Here is your song:\n\n<div class="song-player-box"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1" allow="autoplay"></iframe></div>`;
-
                 session.messages.push({ sender: 'ai', text: songReply });
-
                 saveSessions();
-
                 container.innerHTML += `<div class="message-wrapper ai"><div class="message">${renderMarkdown(songReply)}</div>${createAiActions(songReply)}</div>`;
-
                 container.scrollTop = container.scrollHeight;
-
                 return;
-
             }
-
-
 
             if (lowerQuery.includes('develop panathu yaru') || lowerQuery.includes('who developed you')) {
-
                 session.messages.push({ sender: 'user', text: rawText });
-
                 saveSessions(); renderHistory();
-
                 const container = document.getElementById('chatMessages');
-
                 container.innerHTML += `<div class="message-wrapper user"><div class="message"><span>${escapeHtml(rawText)}</span></div></div>`;
-
                 textarea.value = ''; textarea.style.height = '24px';
-
                 const devReply = "B.SomasriAbishek - Developer";
-
                 session.messages.push({ sender: 'ai', text: devReply });
-
                 saveSessions();
-
                 container.innerHTML += `<div class="message-wrapper ai"><div class="message">${renderMarkdown(devReply)}</div>${createAiActions(devReply)}</div>`;
-
                 container.scrollTop = container.scrollHeight;
-
                 if (autoSpeak || isLiveVoiceMode) speakText(devReply);
-
                 return;
-
             }
-
-
 
             session.messages.push({ sender: 'user', text: rawText, image: currentImgBase64 });
-
             saveSessions(); renderHistory();
 
-
-
             const container = document.getElementById('chatMessages');
-
             let imgHtml = currentImgBase64 ? `<img src="${currentImgBase64}">` : '';
-
             container.innerHTML += `<div class="message-wrapper user"><div class="message">${imgHtml}<span>${escapeHtml(rawText)}</span></div></div>`;
-
             textarea.value = ''; textarea.style.height = '24px'; removeImage();
-
             container.scrollTop = container.scrollHeight;
-
-
 
             setGeneratingState(true);
-
             const loadingId = 'loading_' + Date.now();
-
             container.innerHTML += `<div class="message-wrapper ai" id="${loadingId}"><div class="finding-container" id="activeLoading"><div class="rotating-logo"><img src="logo.svg" alt="Logo" /></div><span>KayalFly Finding...</span></div></div>`;
-
             container.scrollTop = container.scrollHeight;
 
-
-
             try {
-
                 const formData = new FormData();
-
                 formData.append('chatInput', rawText);
-
                 formData.append('sessionId', currentSessionId);
-
                 if (currentImgFile) formData.append('image', currentImgFile);
 
-
-
                 const response = await fetch(webhookUrl, { method: 'POST', body: formData });
-
                 const data = await response.json();
-
                 document.getElementById(loadingId)?.remove();
-
-
 
                 let fullAiReply = data.output || data.text || data.message || JSON.stringify(data);
-
                 let aiReply = fullAiReply.trim();
 
-
-
                 session.messages.push({ sender: 'ai', text: aiReply });
-
                 saveSessions();
 
-
-
                 const aiMsgId = 'ai_msg_' + Date.now();
-
                 const aiWrapperId = 'ai_wrap_' + Date.now();
-
                 container.innerHTML += `<div class="message-wrapper ai" id="${aiWrapperId}"><div class="message" id="${aiMsgId}"></div></div>`;
 
-
-
                 let charIdx = 0;
-
                 const msgBox = document.getElementById(aiMsgId);
-
                 const wrapperBox = document.getElementById(aiWrapperId);
 
-
-
                 function typeWriter() {
-
                     if (!isGenerating) return;
-
                     if (charIdx < aiReply.length) {
-
                         msgBox.innerHTML = renderMarkdown(aiReply.substring(0, charIdx + 4));
-
                         charIdx += 4;
-
                         container.scrollTop = container.scrollHeight;
-
                         activeTypewriterTimeout = setTimeout(typeWriter, 10);
-
                     } else {
-
                         msgBox.innerHTML = renderMarkdown(aiReply);
-
                         wrapperBox.insertAdjacentHTML('beforeend', createAiActions(aiReply));
-
                         container.scrollTop = container.scrollHeight;
-
                         setGeneratingState(false);
-
                         if (autoSpeak || isLiveVoiceMode) speakText(aiReply);
-
                     }
-
                 }
-
                 typeWriter();
-
             } catch (e) {
-
                 document.getElementById(loadingId)?.remove();
-
                 setGeneratingState(false);
-
                 container.innerHTML += `<div class="message-wrapper ai"><div class="message" style="color: #ef4444;">Connection error.</div></div>`;
-
             }
-
         }
-
-
 
         function escapeHtml(text) {
-
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-
             return text.replace(/[&<>"']/g, m => map[m]);
-
         }
-
     </script>
-
 </body>
-
 </html>
